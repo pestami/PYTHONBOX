@@ -2,20 +2,18 @@
 clf();
 x=[-100:1:100];
 //----------------------------------------------------
-function [y] = fx(x)
+function [y] = MyQuadratic(x)
 a=1;
 b=2;
 c=4;
     y=a*x^2+b*x+c
 endfunction
 //---------------------------------------------------
+//We can use the linspace function in order to produce 50 values in the interval [1,10].
 
-//----------------------------------------------------
-function [y] = ROT(a,x,y)
-x = [1 2 3; 4 5 6]
-    y=a*x^2+b*x+c
-endfunction
+xdata = linspace ( 1 , 10 , 5 );
+ydata = MyQuadratic (xdata);
 //---------------------------------------------------
 
 
-plot(x,fx(x),1);
+plot(xdata,ydata);
