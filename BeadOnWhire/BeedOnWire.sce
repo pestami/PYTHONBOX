@@ -116,8 +116,11 @@ end
 //====================================================================================
 f = scf(1); // Create a new figure or select an existing figure with an id of 0.
     plot(ELEMENT_nr,ELEMENT_T,"b");  title("Time Taken (seconds)") ;
+    
+    xs2jpg(1, 'BeadTime.jpg'); // Export to a JPG file
 
-    gcf(1).children.grid = color("grey70")*[1 1]; // grids
+    //gcf(1).children.grid = color("grey70")*[1 1]; // grids
+    //xs2jpg(1, 'BeadTime.jpg'); // Export to a JPG file
 
 //====================================================================================
 
