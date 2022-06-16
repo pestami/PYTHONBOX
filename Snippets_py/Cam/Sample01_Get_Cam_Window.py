@@ -75,7 +75,7 @@ while(True):
     dim = (width, height)
 
     # resize image
-    grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
+##    grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
     grey_img_2 = grey_img.copy()
 
 
@@ -126,6 +126,8 @@ while(True):
         sONOFF='OFF '
 
 
+##    rect = cv2.Rect(x, y, width, height)
+##    region = image(rect)
 
     # font
     font = cv2.FONT_HERSHEY_SIMPLEX
