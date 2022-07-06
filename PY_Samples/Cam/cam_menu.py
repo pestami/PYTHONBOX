@@ -54,7 +54,7 @@ class cam_menu:
         height1 = int(image.shape[0]  / 20)
         cmd="NULL"
 
-        if (Y> height1) & (X < width1) :
+        if (Y< height1) and (X < width1) :
 
             cmd="QUIT"
 

@@ -85,9 +85,10 @@ Ymenu=1000
 sCMD= 'command'
 MousePointCounter = 1
 def mousePoints(event,x,y,flags,params):
-    global MousePointCounter
+    global MousePointCounter,Xmenu, Ymenu
     # Left button mouse click event opencv
 
+    dummy=199
 
     if event == cv2.EVENT_LBUTTONDOWN:
         if (x < dim[0]) & (y < dim[1]) :
@@ -347,8 +348,7 @@ while(True):
     image = cv2.putText(grey_img_2, sONOFF + str(sBrightness), org, font,
                        fontScale, color, thickness, cv2.LINE_AA)
     org = (500, 40)
-    image = cv2.putText(grey_img_2, sText + str(MousePointCounter), org, font,
-                       fontScale, color, thickness, cv2.LINE_AA)
+    image = cv2.putText(grey_img_2, sText + str(MousePointCounter), org, font,fontScale, color, thickness, cv2.LINE_AA)
 
     org = (200, 40)
     image = cv2.putText(grey_img_2, sCMD, org, font,
@@ -402,6 +402,7 @@ while(True):
     cv2.setMouseCallback('frame', mousePoints)
 
     sCMD=cam_menu.cam_menu.command(cv2,grey_img,Xmenu,Ymenu)
+    print(Xmenu , Ymenu)
 
     print('CMD=' + sCMD)
 
