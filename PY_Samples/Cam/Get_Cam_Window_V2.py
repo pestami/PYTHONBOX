@@ -20,7 +20,22 @@ if __name__ == '__main__':
 import numpy as np
 import cv2
 import csv
+
+import cam_annotate
+import cam_menu
 ##=============================================================================
+def GetImageDimensions(image):
+
+    # Get Image dimensions
+    scale_percent = 100 # percent of original size
+    width = int(grey_img.shape[1] * scale_percent / 100)
+    height = int(grey_img.shape[0] * scale_percent / 100)
+
+    MID_width = int(width/2)
+    MID_height = int(height/2)
+
+    return (width, height)
+
 
 def ExportMountingFrame(sPathFile,DataPoints):
     # field names
@@ -59,26 +74,36 @@ def ImportMountingFrame(sPathFile):
 # Create point matrix get coordinates of mouse click on image
 X1=[0,1,0,0,0]
 Y1=[0,1,0,0,0]
-counter =1
+MousePointCounter =1
 
 X2=[0,0,0,0,0]
 Y2=[0,0,0,0,0]
 
+Xmenu=1000
+Ymenu=1000
+
 sCMD= 'command'
-counter = 1
+MousePointCounter = 1
 def mousePoints(event,x,y,flags,params):
-    global counter
+    global MousePointCounter
     # Left button mouse click event opencv
+
+
     if event == cv2.EVENT_LBUTTONDOWN:
         if (x < dim[0]) & (y < dim[1]) :
             print('Co-ordinate:',x,y)
-            X1[counter] = x
-            Y1[counter] = y
-            counter = counter + 1
-            if counter == 5 :
-                counter = 1
+            X1[MousePointCounter] = x
+            Y1[MousePointCounter] = y
+            MousePointCounter = MousePointCounter + 1
+            if MousePointCounter == 5 :
+                MousePointCounter = 1
+        Xmenu=x
+        Ymenu=y
+
+
     if event == cv2.EVENT_RBUTTONDOWN:
-        if (x < dim[0]) & (y < dim[1]):
+
+        if  (x < dim[0]) & (y < dim[1]):
             print('Circle:',x,y)
             X2[1] = x
             Y2[1] = y
@@ -87,6 +112,8 @@ def mousePoints(event,x,y,flags,params):
 
 
 
+##=============================================================================
+##========PROGRAM BEGI=========================================================
 ##=============================================================================
 ## select image source
 image_source = 2
@@ -112,6 +139,8 @@ scale_percent = 100 # percent of original size
 width = int(grey_img.shape[1] * scale_percent / 100)
 height = int(grey_img.shape[0] * scale_percent / 100)
 dim = (width, height)
+
+aImageDim=GetImageDimensions(grey_img)
 #------------------------------------------------------------------------------
 
 
@@ -146,35 +175,23 @@ while(True):
 # Get Image with  ?filter?
     if image_source!=2 :
         ret, frame = cap.read()
+        ####    frame = cv2.resize(frame, (400, 400))
+        #grey_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
+
     else:
         grey_img = cv2.imread('grey_img_1.png')
 #------------------------------------------------------------------------------
 
-##    # Capture frame-by-frame
-##    ret, frame = cap.read()
-####=============================================================================
-##    # Our operations on the frame come here
-####    frame = cv2.resize(frame, (400, 400))
-####     grey_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-##
-##    grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
-##
-##    grey_img_2=grey_img
-####=============================================================================
-##    print('Original Dimensions : ',grey_img.shape)
-
-    scale_percent = 100 # percent of original size
-    width = int(grey_img.shape[1] * scale_percent / 100)
-    height = int(grey_img.shape[0] * scale_percent / 100)
-    dim = (width, height)
-
-
-
     # resize image
-##    grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
+    # grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
+
+
     grey_img_2 = grey_img.copy()
 
+    grey_img=cam_menu.cam_menu.draw(cv2,grey_img)
+
+##    cam_menu.cam_menu.draw
 
 ##    print('Resized Dimensions : ',resized.shape)
 
@@ -190,6 +207,7 @@ while(True):
 ##    cv2.circle(grey_img_2,(100,100), 20, (0,0,255),1)
 ##    cv2.rectangle(grey_img_2,(20,20),(180,180),(0,255,0),3)
 
+    grey_img_2= cam_annotate.cam_annotate.circle(cv2,grey_img_2)
 
     cv2.circle(grey_img_2,MountingFrame[0], 5, (0,0,255),2) #BGR
     cv2.circle(grey_img_2,MountingFrame[1], 5, (0,0,255),2)
@@ -251,8 +269,8 @@ while(True):
 ##=============================================================================
 # write PIXEL
 
-    for i in [(100,100),(101,101),(101,100),(100,101)]:
-        grey_img_2[ i[0] ][ i[1] ]  = 0
+##    for i in [(100,100),(101,101),(101,100),(100,101)]:
+##        grey_img_2[ i[0] ][ i[1] ]  = 0
 
 ##    grey_img_2[ 15 ][ 15]  = [0, 0, 0]
 ##    grey_img_2[ X2[1] ][ Y2[1]]  = 255
@@ -261,20 +279,37 @@ while(True):
 
 
 # READ PIXEL
+
     for j in range(-10,10):
-        sColorV = grey_img_2[ X2[1] ][ Y2[1]+j]
-        sColorH = grey_img_2[ X2[1]+j ][ Y2[1]]
+            if j==-10:
+                sBrightnessV1=0
+                sBrightnessH1=0
+                sBrightnessV2=0
+                sBrightnessH2=0
+            sColorV1 = grey_img_2[ X2[1]+0 ][ Y2[1]+j]
+            sColorV2 = grey_img_2[ X2[1]+j ][ Y2[1]+j]
+            sColorH1 = grey_img_2[ X2[1]+j ][ Y2[1]+0]
+            sColorH2 = grey_img_2[ X2[1]-j ][ Y2[1]+j]
 
-        sBrightnessV= (1*sColorV[0] + 1*sColorV[1] + 1*sColorV[2])/3
-        sBrightnessH= (1*sColorH[0] + 1*sColorH[1] + 1*sColorH[2])/3
-        sBrightness=int((sBrightnessV + sBrightnessH)/2/10) *10 # remove 1 digit
+            print(sColorV1)
+
+            sBrightnessV1=sBrightnessV1+ (1*sColorV1[0] + 1*sColorV1[1] + 1*sColorV1[2])/3
+            sBrightnessV2=sBrightnessV2+ (1*sColorV2[0] + 1*sColorV2[1] + 1*sColorV2[2])/3
+
+            sBrightnessH1=sBrightnessH1+ (1*sColorH1[0] + 1*sColorH1[1] + 1*sColorH1[2])/3
+            sBrightnessH2=sBrightnessH2+ (1*sColorH2[0] + 1*sColorH2[1] + 1*sColorH2[2])/3
+
+    sBrigntnessX=(sBrightnessV1 + sBrightnessH1 +sBrightnessV2 + sBrightnessH2)/4/21
 
 
-    if sBrightness > 50 :
-        sONOFF='ON '
+    sBrightness=int((sBrigntnessX)/10) *10 # remove 1 digit
+
+
+    if sBrightness > 200 :
+        sONOFF='LED ON '
         nCircle=10
     else:
-        sONOFF='OFF '
+        sONOFF='LED OFF '
         nCircle=1
 
  # Draw circle for LED query
@@ -299,20 +334,20 @@ while(True):
     thickness = 1
     # Using cv2.putText() method
     sText="..."
-    if counter==4:
+    if MousePointCounter==4:
             sText='Point TL '
-    if counter==1:
+    if MousePointCounter==1:
             sText='Point BL '
-    if counter==2:
+    if MousePointCounter==2:
             sText='Point BR '
-    if counter==3:
+    if MousePointCounter==3:
             sText='Point TR '
 
-    org = (20, 20)
+    org = (500, 20)
     image = cv2.putText(grey_img_2, sONOFF + str(sBrightness), org, font,
                        fontScale, color, thickness, cv2.LINE_AA)
-    org = (20, 40)
-    image = cv2.putText(grey_img_2, sText + str(counter), org, font,
+    org = (500, 40)
+    image = cv2.putText(grey_img_2, sText + str(MousePointCounter), org, font,
                        fontScale, color, thickness, cv2.LINE_AA)
 
     org = (200, 40)
@@ -365,6 +400,13 @@ while(True):
     cv2.imshow('frame',img_3)
 
     cv2.setMouseCallback('frame', mousePoints)
+
+    sCMD=cam_menu.cam_menu.command(cv2,grey_img,Xmenu,Ymenu)
+
+    print('CMD=' + sCMD)
+
+    if sCMD=="QUIT":
+        break
 ##=============================================================================
 # When everything done, release the capture
 cap.release()
