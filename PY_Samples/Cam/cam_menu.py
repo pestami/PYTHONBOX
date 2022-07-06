@@ -21,25 +21,39 @@ class cam_menu:
 
         # Get Image dimensions
 
-        width = int(image.shape[1] / 20)
+        width = int(image.shape[1] / 5)
         height = int(image.shape[0]  / 20)
+        step = int(image.shape[1] / 5)
 
-
-        start_point = (1, 1)
-        end_point = (width, width)
-        color = (255, 0, 0) # Blue color in BGR
+        TextX = int((width)/ 80) + 1
+        TextY = int(height ) + 1
+##
+##        start_point = (1, 1)
+##        end_point = (width, width)
+        color = (100, 0, 100) # Blue color in BGR
         thickness = 2 # Line thickness of 2 px
         # Using cv2.rectangle() method
-        image = oCV2.rectangle(image, start_point, end_point, color, thickness)
+
+        menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","...."]
+        font = cv2.FONT_HERSHEY_SIMPLEX # font
+        org = (TextX, TextY) # org
+        fontScale = 0.4 # fontScale
+        thickness = 1 # Line thickness of 2 px
+
+        for i in[0,1,2,3,4]:
+                start_point = (1+step*i, 1)
+                end_point = (1+step*i+ width, height)
+                TextX = int(1+step*i +(width)/ 80) + 1
+                TextY = int(height ) + 1
+                org=(TextX,TextY)
+                image = oCV2.rectangle(image, start_point, end_point, color, thickness)
+                image = oCV2.putText(image, menu[i], org, font, fontScale, color, thickness, oCV2.LINE_AA)
 
 
         font = cv2.FONT_HERSHEY_SIMPLEX # font
-
-        org = (20, 10) # org
-        fontScale = 0.5 # fontScale
-        color = (0, 255, 0) # Blue color in BGR
+        org = (TextX, TextY) # org
+        fontScale = 0.4 # fontScale
         thickness = 1 # Line thickness of 2 px
-        org = (int(width/3), int(width/3))  #X Y
         # Using cv2.putText() method
         image = oCV2.putText(image, "QUIT", org, font, fontScale, color, thickness, oCV2.LINE_AA)
 
@@ -50,11 +64,13 @@ class cam_menu:
 
         # Get Image dimensions
 
-        width1 = int(image.shape[1] / 20)
-        height1 = int(image.shape[0]  / 20)
+        width = int(image.shape[1] / 5)
+        height = int(image.shape[0]  / 20)
+        step = int(image.shape[1] / 5)
+
         cmd="NULL"
 
-        if (Y< height1) and (X < width1) :
+        if (Y< width) and (X < width) :
 
             cmd="QUIT"
 
