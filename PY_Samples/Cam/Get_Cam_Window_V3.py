@@ -35,28 +35,19 @@ def GetImageDimensions(image):
     MID_height = int(height/2)
 
     return (width, height)
-
-
+#===============================================================================
 def ExportMountingFrame(sPathFile,DataPoints):
     # field names
     fields = ['POSITION', 'X', 'Y']
-
+##    print(DataPoints)
     # data rows of csv file
-##    DataPoints = [
-##             ['TL', 'COE', '2', '9.0'],
-##             ['BL', 'COE', '2', '9.1'],
-##             ['BR', 'IT', '2', '9.3'],
-##             ['TR', 'SE', '1', '9.5'],
-##            ]
-
     with open(sPathFile, 'w',newline='') as f:
 
         # using csv.writer method from CSV package
         write = csv.writer(f)
-
 ##        write.writerow(fields) # header
         write.writerows(DataPoints )
-
+#===============================================================================
 def ImportMountingFrame(sPathFile):
      with open(sPathFile, mode ='r') as csvfile:
 
@@ -91,7 +82,7 @@ def mousePoints(event,x,y,flags,params):
     dummy=199
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        if (x < dim[0]) & (y < dim[1]) :
+        if (x < dim[0]) & (25 <y < dim[1]) :  # menue click ignored !!
             print('Co-ordinate:',x,y)
             X1[MousePointCounter] = x
             Y1[MousePointCounter] = y
@@ -104,7 +95,7 @@ def mousePoints(event,x,y,flags,params):
 
     if event == cv2.EVENT_RBUTTONDOWN:
 
-        if  (x < dim[0]) & (y < dim[1]):
+        if  (x < dim[0]) & ( y < dim[1]):
             print('Circle:',x,y)
             X2[1] = x
             Y2[1] = y
@@ -143,7 +134,7 @@ dim = (width, height)
 
 aImageDim=GetImageDimensions(grey_img)
 #------------------------------------------------------------------------------
-
+print('====PROGRAM START==========================================')
 
 P1X= int(-width/3 + width/2)
 P1Y= int(-height/3 + height/2)
@@ -169,9 +160,8 @@ MountingFrame=[(P1X,P1Y),(P2X,P2Y),(P3X,P3Y),(P4X,P4Y),(P5X,P5Y)]
 
 MP_WORLD= [('TL',P1X,P1Y),('BL',P2X,P2Y),('BR',P3X,P3Y),('TR',P4X,P4Y)] #mounting frame world
 
-
+print('====PROGRAM MAIN LOOP==========================================')
 while(True):
-
 #------------------------------------------------------------------------------
 # Get Image with  ?filter?
     if image_source!=2 :
@@ -179,21 +169,13 @@ while(True):
         ####    frame = cv2.resize(frame, (400, 400))
         #grey_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
-
     else:
         grey_img = cv2.imread('grey_img_1.png')
 #------------------------------------------------------------------------------
     # resize image
     # grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
-
-
     grey_img_2 = grey_img.copy()
-
     grey_img=cam_menu.cam_menu.draw(cv2,grey_img)
-
-##    cam_menu.cam_menu.draw
-##    print('Resized Dimensions : ',resized.shape)
-
 ##=============================================================================
 
     # Display the resulting frame
@@ -245,7 +227,19 @@ while(True):
                  ['TR',X1[4],Y1[4]]
                 ]
 ##=============================================================================
+    sCMD=cam_menu.cam_menu.command(cv2,grey_img,Xmenu,Ymenu)
+
+    if sCMD=="QUIT":
+        break
+    if sCMD != "NULL":
+        print(Xmenu , Ymenu , 'CMD=' + sCMD)
+        Xmenu=1000
+        Ymenu=1000
+
     if sCMD=='LOAD PTS':
+        print('====IMPORT CSV==============================================')
+        print('IMPORT CSV - datapointsWORLD.csv')
+
         # Draw Lines of  imported Mounting Frame
         sPathFile='datapointsWORLD.csv'
         MP_WORLD=ImportMountingFrame(sPathFile)
@@ -259,6 +253,22 @@ while(True):
                 PTS_pre=PTS
             if i== 4:
                 PTS_pre=PTS
+
+    if sCMD=='SAVE PTS':
+        print('====EXPORT CSV==============================================')
+        print('EXPORT CSV - datapointsCAM.csv')
+        sPathFile='datapointsCAM.csv'
+        ExportMountingFrame(sPathFile,DataPoints)
+        print(DataPoints)
+
+    if sCMD=='SAVE IMG':
+        print('====EXPORT CSV==============================================')
+        print('EXPORT CSV - grey_img_1.png grey_img_2.png')
+        cv2.imwrite('grey_img_1.png',grey_img)
+        cv2.imwrite('grey_img_2.png',grey_img_2)
+        print('EXPORT png')
+
+    sCMD=="NULL" # stop command
 ##=============================================================================
 ##    cv2.line(img= grey_img_2, pt1=(X1[4], Y1[4]), pt2=(X1[1], Y1[1]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
 ##    cv2.line(img= grey_img_2, pt1=(X1[1], Y1[1]), pt2=(X1[2], Y1[2]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
@@ -364,50 +374,27 @@ while(True):
 # KEYSTRIKE COMMANDS
     # EXPORT CSV
     if cv2.waitKey(1) & 0xFF == ord('e'):
-        sPathFile='datapointsCAM.csv'
-        ExportMountingFrame(sPathFile,DataPoints)
         print('====EXPORT CSV==============================================')
-        print('EXPORT CSV')
-        print('')
-        sCMD= 'EXPORTED POINTS'
 
     # IMPORT CSV
     if cv2.waitKey(1) & 0xFF == ord('i'):
-        sPathFile='datapointsWORLD.csv'
-        MP_WORLD=ImportMountingFrame(sPathFile)
         print('====IMPORT CSV==============================================')
-        print('IMPORT CSV')
-        print(MP_WORLD)
-        print('')
-        sCMD= 'IMPORTED POINTS'
-
 
     # SAVE IMAGE
     if cv2.waitKey(1) & 0xFF == ord('s'):
         cv2.imwrite('grey_img_1.png',grey_img)
         cv2.imwrite('grey_img_2.png',grey_img_2)
-
         print('EXPORT png')
         sCMD= 'EXPORTED IMAGES L & R'
-
-
     # QUIT
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 ##=============================================================================
 # IMAGE SHOW
     img_3 = np.concatenate((grey_img, grey_img_2), axis=1)
-
     cv2.imshow('frame',img_3)
-
     cv2.setMouseCallback('frame', mousePoints)
 
-    sCMD=cam_menu.cam_menu.command(cv2,grey_img,Xmenu,Ymenu)
-    print(Xmenu , Ymenu , 'CMD=' + sCMD)
-
-
-    if sCMD=="QUIT":
-        break
 ##=============================================================================
 # When everything done, release the capture
 cap.release()
