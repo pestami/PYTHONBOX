@@ -16,26 +16,42 @@ import csv
 
 class cam_menu:
 
-    menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","...."]
-#----------------------------------------------------------------------------
-    def draw(oCV2,image):
+    ##  Class variables: This variable is shared between all objects of a class
+    menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","FREE 1","FREE 2"]
+    ## command history and command latest
+    aCMD=["NULL","QUIT1","QUIT2"]
 
-        # Get Image dimensions
 
-        width_button = int(image.shape[1] / 5)
-        height_button = int(image.shape[0] / 20)
-        spacing_button = int(image.shape[1] / 5)
+    #========================================================
+    def __init__(self, oCV2,image):
 
-        color = (100, 0, 100) # Blue color in BGR
-        thickness = 2 # Line thickness of 2 px
-        # Using cv2.rectangle() method
+        ## class attributes
+        self.menue_items=len(self.menu) + 1
+        self.width_button = int(image.shape[1] / self.menue_items)
+        self.height_button = int(image.shape[0] / 20)
+        self.spacing_button = int(image.shape[1] / self.menue_items)
+        self.color = (100, 0, 100) # Blue color in BGR
+        self.thickness = 2 # Line thickness of 2 px
+##        print("INITIALIZE: width height sapacing",width_button,height_button,spacing_button ) # test = ok
+
+#-------------------------------------------------------
+#-------------------------------------------------------
+    def draw(self,oCV2,image):
+
+        width_button =self.width_button
+        height_button = self.height_button
+        spacing_button = self.spacing_button
+        color = self.color
+        thickness =self.thickness
+
+         # Using cv2.rectangle() method
 
 ##        menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","...."]
         font = cv2.FONT_HERSHEY_SIMPLEX # font
         fontScale = 0.4 # fontScale
         thickness = 1 # Line thickness of 2 px
 
-        for i in[0,1,2,3,4]:
+        for i in range(0, self.menue_items-1):
                 start_point = (1+spacing_button*i, 1)
                 end_point = (1+spacing_button*i+ width_button, height_button)
                 TextX = int(1+spacing_button*i +(width_button)/ 80) + 1
@@ -45,14 +61,13 @@ class cam_menu:
                 image = oCV2.putText(image, cam_menu.menu[i], org, font, fontScale, color, thickness, oCV2.LINE_AA)
 
         return image
-#----------------------------------------------------------------------------
-    def command(oCV2,image,X,Y):
+#----------------------------------------------------------
+    def command(self,oCV2,image,X,Y):
 
         # Get Image dimensions
-
-        width_button = int(image.shape[1] / 5)
-        height_button = int(image.shape[0] / 20)
-        spacing_button = int(image.shape[1] / 5)
+        width_button =self.width_button
+        height_button = self.height_button
+        spacing_button = self.spacing_button
 
 ##        menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","...."]
         cmd="NULL"
@@ -64,12 +79,16 @@ class cam_menu:
             if (Y< height_button) and (start_point[0] < X < end_point[0]) :
                 cmd=cam_menu.menu[i]
 
-        return cmd
+                cam_menu.aCMD[2]=cam_menu.aCMD[1]
+                cam_menu.aCMD[1]=cam_menu.aCMD[0]
+                cam_menu.aCMD[0]=cmd
+
+
+        return cam_menu.aCMD
 #----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':
-
 
 
     print("CAM_MENUE")

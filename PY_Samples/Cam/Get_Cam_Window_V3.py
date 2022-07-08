@@ -74,7 +74,10 @@ Xmenu=1000
 Ymenu=1000
 
 sCMD= 'command'
+aCMD=["NULL","QUIT1","QUIT2"]
 MousePointCounter = 1
+
+#=============================================================================
 def mousePoints(event,x,y,flags,params):
     global MousePointCounter,Xmenu, Ymenu
     # Left button mouse click event opencv
@@ -100,12 +103,12 @@ def mousePoints(event,x,y,flags,params):
             X2[1] = x
             Y2[1] = y
             print('Circle XY:',X2,Y2)
-
+#=============================================================================
 
 
 
 ##=============================================================================
-##========PROGRAM BEGI=========================================================
+##========PROGRAM BEGIN========================================================
 ##=============================================================================
 ## select image source
 image_source = 2
@@ -134,7 +137,7 @@ dim = (width, height)
 
 aImageDim=GetImageDimensions(grey_img)
 #------------------------------------------------------------------------------
-print('====PROGRAM START==========================================')
+print('====PROGRAM START========================')
 
 P1X= int(-width/3 + width/2)
 P1Y= int(-height/3 + height/2)
@@ -160,7 +163,10 @@ MountingFrame=[(P1X,P1Y),(P2X,P2Y),(P3X,P3Y),(P4X,P4Y),(P5X,P5Y)]
 
 MP_WORLD= [('TL',P1X,P1Y),('BL',P2X,P2Y),('BR',P3X,P3Y),('TR',P4X,P4Y)] #mounting frame world
 
-print('====PROGRAM MAIN LOOP==========================================')
+print('====PROGRAM MAIN LOOP==================')
+
+menu=cam_menu.cam_menu(cv2,grey_img)
+
 while(True):
 #------------------------------------------------------------------------------
 # Get Image with  ?filter?
@@ -175,7 +181,7 @@ while(True):
     # resize image
     # grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
     grey_img_2 = grey_img.copy()
-    grey_img=cam_menu.cam_menu.draw(cv2,grey_img)
+    grey_img=menu.draw(cv2,grey_img)
 ##=============================================================================
 
     # Display the resulting frame
@@ -219,6 +225,9 @@ while(True):
     cv2.line(img= grey_img_2, pt1=(X1[1], Y1[1]), pt2=(X1[2], Y1[2]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
     cv2.line(img= grey_img_2, pt1=(X1[2], Y1[2]), pt2=(X1[3], Y1[3]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
     cv2.line(img= grey_img_2, pt1=(X1[3], Y1[3]), pt2=(X1[4], Y1[4]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
+
+
+
     # Make Export CSV
     DataPoints= [
                  ['TL',X1[1],Y1[1]],
@@ -226,8 +235,19 @@ while(True):
                  ['BR',X1[3],Y1[3]],
                  ['TR',X1[4],Y1[4]]
                 ]
+
+    POINT=[[]]
+    for PTS,i in zip(MP_WORLD,[0,1,2,3,4,5]):
+        if i== 1: PTS_pre=PTS
+        if i > 0 :
+        # POINT[i][1][2] =2
+            cv2.line(img= grey_img_2, pt1=(int(PTS_pre[1]), int(PTS_pre[2])), pt2=(int(PTS[1]), int(PTS[2])), color=(0, 0, 0), thickness=5, lineType=8, shift=0)
+            PTS_pre=PTS
+        if i== 4:
+            PTS_pre=PTS
+
 ##=============================================================================
-    sCMD=cam_menu.cam_menu.command(cv2,grey_img,Xmenu,Ymenu)
+##    sCMD=menu.command(cv2,grey_img,Xmenu,Ymenu)  # do not draw image in begin
 
     if sCMD=="QUIT":
         break
@@ -244,16 +264,6 @@ while(True):
         sPathFile='datapointsWORLD.csv'
         MP_WORLD=ImportMountingFrame(sPathFile)
 
-        POINT=[[]]
-        for PTS,i in zip(MP_WORLD,[0,1,2,3,4,5]):
-            if i== 1: PTS_pre=PTS
-            if i > 0 :
-            # POINT[i][1][2] =2
-                cv2.line(img= grey_img_2, pt1=(int(PTS_pre[1]), int(PTS_pre[2])), pt2=(int(PTS[1]), int(PTS[2])), color=(0, 0, 0), thickness=5, lineType=8, shift=0)
-                PTS_pre=PTS
-            if i== 4:
-                PTS_pre=PTS
-
     if sCMD=='SAVE PTS':
         print('====EXPORT CSV==============================================')
         print('EXPORT CSV - datapointsCAM.csv')
@@ -264,36 +274,23 @@ while(True):
     if sCMD=='SAVE IMG':
         print('====EXPORT CSV==============================================')
         print('EXPORT CSV - grey_img_1.png grey_img_2.png')
-        cv2.imwrite('grey_img_1.png',grey_img)
+##        cv2.imwrite('grey_img_1.png',grey_img)
         cv2.imwrite('grey_img_2.png',grey_img_2)
         print('EXPORT png')
 
-    sCMD=="NULL" # stop command
-##=============================================================================
-##    cv2.line(img= grey_img_2, pt1=(X1[4], Y1[4]), pt2=(X1[1], Y1[1]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-##    cv2.line(img= grey_img_2, pt1=(X1[1], Y1[1]), pt2=(X1[2], Y1[2]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-##    cv2.line(img= grey_img_2, pt1=(X1[2], Y1[2]), pt2=(X1[3], Y1[3]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-##    cv2.line(img= grey_img_2, pt1=(X1[3], Y1[3]), pt2=(X1[4], Y1[4]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-    # Make Export CSV
 
-
+    aCMD[0]="NULL"
+    aCMD=menu.command(cv2,grey_img,Xmenu,Ymenu)
+    sCMD=aCMD[0]
 
 ##=============================================================================
 # write PIXEL
 
-##    for i in [(100,100),(101,101),(101,100),(100,101)]:
-##        grey_img_2[ i[0] ][ i[1] ]  = 0
-
-##    grey_img_2[ 15 ][ 15]  = [0, 0, 0]
-##    grey_img_2[ X2[1] ][ Y2[1]]  = 255
-
-
-
 
 # READ PIXEL
-
-    for j in range(-10,10):
-            if j==-10:
+    nDimCroshair=5
+    for j in range(-nDimCroshair,nDimCroshair):
+            if j==-nDimCroshair:
                 sBrightnessV1=0
                 sBrightnessH1=0
                 sBrightnessV2=0
@@ -312,10 +309,7 @@ while(True):
             sBrightnessH2=sBrightnessH2+ (1*sColorH2[0] + 1*sColorH2[1] + 1*sColorH2[2])/3
 
     sBrigntnessX=(sBrightnessV1 + sBrightnessH1 +sBrightnessV2 + sBrightnessH2)/4/21
-
-
     sBrightness=int((sBrigntnessX)/10) *10 # remove 1 digit
-
 
     if sBrightness > 200 :
         sONOFF='LED ON '
@@ -325,7 +319,7 @@ while(True):
         nCircle=1
 
  # Draw circle for LED query
-    cv2.circle(grey_img_2,(X2[1],Y2[1]), 5, (0,255,0),nCircle)
+    cv2.circle(grey_img_2,(X2[1],Y2[1]), nDimCroshair, (0,255,0),nCircle)
 
 ##    print('Circle LM:',X2[1],Y2[1])
 

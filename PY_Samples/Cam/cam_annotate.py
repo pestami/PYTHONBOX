@@ -43,16 +43,15 @@ class data_points:
 
         aPOINTS =data_points.ImportFrame(sPathFile)
         self.aPOINTS_=aPOINTS
-
+#-------------------------------------------------------
     @classmethod
     def setGlobal(blabla):
-        blabla.aPOINTS_GLOBAL="GLOBAL"
-
-
+        blabla.aPOINTS_GLOBAL="GLOBAL1"
+#-------------------------------------------------------
     def setGlobal2(self):
-        self.__class__.aPOINTS_GLOBAL="GLOBAL"
+        self.__class__.aPOINTS_GLOBAL="GLOBAL2"
 
-
+#-------------------------------------------------------
     def ImportFrame(sPathFile):
          with open(sPathFile, mode ='r') as csvfile:
 
@@ -65,7 +64,7 @@ class data_points:
                     aPOINTS=  aPOINTS + [(row[0],row[1],row[2])]
                     i=i+1
          return aPOINTS
-
+#-------------------------------------------------------
     def ExportFrame(self,sPathFile):
         # field names
         ##fields = ['POSITION', 'X', 'Y']
