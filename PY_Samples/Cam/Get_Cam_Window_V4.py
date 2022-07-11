@@ -64,7 +64,7 @@ def ImportMountingFrame(sPathFile):
 #==============================================================================
 # Global Points
 
-MountingFrame_WORLD= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]] #mounting frame world
+MountingFrame_TRANS_WORLD= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]] #mounting frame world
 MountingFrame_CAMERA= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]]#mounting frame world
 
 #==============================================================================
@@ -76,7 +76,6 @@ Y2=[0,0,0,0,0]
 
 sCMD= 'command'
 aCMD=["NULL","QUIT1","QUIT2"]
-
 
 #=============================================================================
 def mousePoints(event,x,y,flags,params):
@@ -95,7 +94,6 @@ def mousePoints(event,x,y,flags,params):
             print(x , y ,  'aCMD=' )
             print( aCMD)
             print('END===def mousePoints==============' )
-
 
     if event == cv2.EVENT_RBUTTONDOWN:
         print('BEGIN===def mousePoints==============' )
@@ -167,7 +165,7 @@ while(True):
         if i == 3 :
             cv2.line(img= grey_img_2, pt1=(int(PTS[1]), int(PTS[2])), pt2=(int(PTS_Start[1]), int(PTS_Start[2])), color=(255, 0, 0), thickness=4, lineType=8, shift=0)
 
-    for PTS,i in zip(MountingFrame_WORLD,[0,1,2,3]):  # zip uses shortes of two lists
+    for PTS,i in zip(MountingFrame_TRANS_WORLD,[0,1,2,3]):  # zip uses shortes of two lists
         if i== 0:
             PTS_Start=list(PTS)
             PTS_pre=list(PTS)
@@ -188,10 +186,11 @@ while(True):
 
     if sCMD=='LOAD PTS':
         print('====IMPORT CSV==============================================')
-        print('IMPORT CSV - MountingFrame_WORLD.csv')
+        print('IMPORT CSV - MountingFrame_TRANS_WORLD.csv')
         # Draw Lines of  imported Mounting Frame
-        sPathFile='MountingFrame_WORLD.csv'
-        MountingFrame_WORLD=ImportMountingFrame(sPathFile)
+        sPathFile='MountingFrame_TRANS_WORLD.csv'
+        MountingFrame_TRANS_WORLD=ImportMountingFrame(sPathFile)
+        cam_menu.cam_menu.aCMD[0]="DONE"
 
     if sCMD=='SAVE PTS':
         print('====EXPORT CSV==============================================')
@@ -199,6 +198,7 @@ while(True):
         sPathFile='MountingFrame_CAMERA.csv'
         ExportMountingFrame(sPathFile,MountingFrame_CAMERA)
         print(MountingFrame_CAMERA)
+        cam_menu.cam_menu.aCMD[0]="DONE"
 
     if sCMD=='SAVE IMG':
         print('====EXPORT CSV==============================================')
@@ -206,6 +206,7 @@ while(True):
 ##        cv2.imwrite('grey_img_1.png',grey_img)
         cv2.imwrite('grey_img_2.png',grey_img_2)
         print('EXPORT png')
+        cam_menu.cam_menu.aCMD[0]="DONE"
 
     if aCMD[1]=='BL' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
