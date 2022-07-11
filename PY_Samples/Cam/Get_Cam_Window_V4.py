@@ -70,20 +70,13 @@ MountingFrame_CAMERA= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]]#mounting
 #==============================================================================
 ##=============================================================================
 
-# Create point matrix get coordinates of mouse click on image
-X1=[0,1,0,0,0]
-Y1=[0,1,0,0,0]
-MousePointCounter =1
-
+# Create point matrix get coordinates of mouse click on image for CIRCLE
 X2=[0,0,0,0,0]
 Y2=[0,0,0,0,0]
 
-Xmenu=1000
-Ymenu=1000
-XYmenu=[1000,1000]
 sCMD= 'command'
 aCMD=["NULL","QUIT1","QUIT2"]
-MousePointCounter = 1
+
 
 #=============================================================================
 def mousePoints(event,x,y,flags,params):
@@ -96,27 +89,19 @@ def mousePoints(event,x,y,flags,params):
 
     if event == cv2.EVENT_LBUTTONDOWN:
         print('BEGIN===def mousePoints==============' )
-        if (x < dim[0]) & (25 <y < dim[1]) :  # menue click ignored !!
+        if (x < aImageDim[0])  :  # menue click ignored !!
             print('Co-ordinate:',x,y)
-            X1[MousePointCounter] = x
-            Y1[MousePointCounter] = y
-            MousePointCounter = MousePointCounter + 1
-            if MousePointCounter == 5 :
-                MousePointCounter = 1
-        Xmenu=x
-        Ymenu=y
-
-        aCMD=menu.command(cv2,grey_img,Xmenu,Ymenu)
-        print(Xmenu , Ymenu ,  'aCMD=' )
-        print( aCMD)
-        print('END===def mousePoints==============' )
+            aCMD=menu.command(cv2,grey_img,x,y)
+            print(x , y ,  'aCMD=' )
+            print( aCMD)
+            print('END===def mousePoints==============' )
 
 
     if event == cv2.EVENT_RBUTTONDOWN:
         print('BEGIN===def mousePoints==============' )
         printflag=1
 
-        if  (x < dim[0]) & ( y < dim[1]):
+        if  (x < aImageDim[0]) & ( y < aImageDim[1]):
             print('Circle:',x,y)
             X2[1] = x
             Y2[1] = y
@@ -124,7 +109,6 @@ def mousePoints(event,x,y,flags,params):
         print('END===def mousePoints==============' )
 
 #=============================================================================
-
 ##=============================================================================
 ##========PROGRAM BEGIN========================================================
 ##=============================================================================
@@ -148,39 +132,9 @@ else:
     grey_img = cv2.imread('grey_img.png')
 #------------------------------------------------------------------------------
 # Get Image dimensions
-scale_percent = 100 # percent of original size
-width = int(grey_img.shape[1] * scale_percent / 100)
-height = int(grey_img.shape[0] * scale_percent / 100)
-dim = (width, height)
-
 aImageDim=GetImageDimensions(grey_img)
 #------------------------------------------------------------------------------
 print('====PROGRAM START========================')
-
-P1X= int(-width/3 + width/2)
-P1Y= int(-height/3 + height/2)
-
-P2X= int(+width/3 + width/2)
-P2Y= int(-height/3 + height/2)
-
-P3X= int(-width/3 + width/2)
-P3Y= int(+height/3 + height/2)
-
-P4X= int(+width/3 + width/2)
-P4Y= int(+height/3 + height/2)
-
-P5X= int( width/2)
-P5Y= int( height/2)
-
-
-
-X2=[0,int(width/2),0,0,0]
-Y2=[0,int(height/2),0,0,0]
-
-MountingFrame=[(P1X,P1Y),(P2X,P2Y),(P3X,P3Y),(P4X,P4Y),(P5X,P5Y)]
-MP_WORLD= [('TL',P1X,P1Y),('BL',P2X,P2Y),('BR',P3X,P3Y),('TR',P4X,P4Y)] #mounting frame world
-
-
 print('====PROGRAM MAIN LOOP==================')
 
 menu=cam_menu.cam_menu(cv2,grey_img)
@@ -202,71 +156,29 @@ while(True):
     grey_img=menu.draw(cv2,grey_img)
 ##=============================================================================
 
-    # Display the resulting frame
-    thresh = 128
-
-##    grey_img_2 = cv2.cvtColor(grey_img_2, cv2.COLOR_BGR2GRAY)
-##    if cv2.waitKey(1) & 0xFF == ord('b'):
-##         grey_img_2 = cv2.threshold(grey_img_2, thresh, 255, cv2.THRESH_BINARY)[1]
-##    cv2.line(img= grey_img_2, pt1=(10, 10), pt2=(100, 100), color=(0, 0, 0), thickness=5, lineType=8, shift=0)
-##    cv2.circle(grey_img_2,(100,100), 20, (0,0,255),1)
-##    cv2.rectangle(grey_img_2,(20,20),(180,180),(0,255,0),3)
-
-    grey_img_2= cam_annotate.cam_annotate.circle(cv2,grey_img_2)
-
-    cv2.circle(grey_img_2,MountingFrame[0], 5, (0,0,255),2) #BGR
-    cv2.circle(grey_img_2,MountingFrame[1], 5, (0,0,255),2)
-    cv2.circle(grey_img_2,MountingFrame[2], 5, (0,0,255),2)
-    cv2.circle(grey_img_2,MountingFrame[3], 5, (0,0,255),2)
-    cv2.circle(grey_img_2,MountingFrame[4], 5, (0,0,255),2)
-
-##    if counter == 1 :
-##        cv2.circle(grey_img_2,MountingFrame[0], 5, (0,0,255),1)
-##    if counter == 2 :
-##        cv2.circle(grey_img_2,MountingFrame[1], 5, (0,0,255),1)
-##    if counter == 3 :
-##        cv2.circle(grey_img_2,MountingFrame[2], 5, (0,0,255),1)
-##    if counter == 4 :
-##        cv2.circle(grey_img_2,MountingFrame[3], 5, (0,0,255),1)
-    # Draw Lines of Mounting Frame WORLD
-    for POINT in MP_WORLD:
-        try:
-            cv2.circle(grey_img_2,(int(POINT[1]),int(POINT[2])), 10, (0,255,0),1)
-##            print('Point World:',POINT)
-        except:
-##            print("Not integfer",POINT)
-            dummmy=2
-
-
-    # Draw Lines of Mounting Frame
-    cv2.line(img= grey_img_2, pt1=(X1[4], Y1[4]), pt2=(X1[1], Y1[1]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-    cv2.line(img= grey_img_2, pt1=(X1[1], Y1[1]), pt2=(X1[2], Y1[2]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-    cv2.line(img= grey_img_2, pt1=(X1[2], Y1[2]), pt2=(X1[3], Y1[3]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-    cv2.line(img= grey_img_2, pt1=(X1[3], Y1[3]), pt2=(X1[4], Y1[4]), color=(255, 0, 0), thickness=5, lineType=8, shift=0)
-
-
-
-    # Make Export CSV
-    DataPoints= [
-                 ['TL',X1[1],Y1[1]],
-                 ['BL',X1[2],Y1[2]],
-                 ['BR',X1[3],Y1[3]],
-                 ['TR',X1[4],Y1[4]]
-                ]
-
-    POINT=[[]]
-    for PTS,i in zip(MP_WORLD,[0,1,2,3,4,5]):
-        if i== 1: PTS_pre=PTS
+    #MountingFrame_CAMERA = [['TL', 358, 352], ['BL', 266, 248], ['BR', 446, 155], ['TR', 410, 114]]  #BGR
+    for PTS,i in zip(MountingFrame_CAMERA,[0,1,2,3]):  # zip uses shortes of two lists
+        if i== 0:
+            PTS_Start=list(PTS)
+            PTS_pre=list(PTS)
         if i > 0 :
-        # POINT[i][1][2] =2
-            cv2.line(img= grey_img_2, pt1=(int(PTS_pre[1]), int(PTS_pre[2])), pt2=(int(PTS[1]), int(PTS[2])), color=(0, 0, 0), thickness=5, lineType=8, shift=0)
-            PTS_pre=PTS
-        if i== 4:
-            PTS_pre=PTS
+            cv2.line(img= grey_img_2, pt1=(int(PTS_pre[1]), int(PTS_pre[2])), pt2=(int(PTS[1]), int(PTS[2])), color=(255, 0, 0), thickness=4, lineType=8, shift=0)
+            PTS_pre=list(PTS)
+        if i == 3 :
+            cv2.line(img= grey_img_2, pt1=(int(PTS[1]), int(PTS[2])), pt2=(int(PTS_Start[1]), int(PTS_Start[2])), color=(255, 0, 0), thickness=4, lineType=8, shift=0)
+
+    for PTS,i in zip(MountingFrame_WORLD,[0,1,2,3]):  # zip uses shortes of two lists
+        if i== 0:
+            PTS_Start=list(PTS)
+            PTS_pre=list(PTS)
+        if i > 0 :
+            cv2.line(img= grey_img_2, pt1=(int(PTS_pre[1]), int(PTS_pre[2])), pt2=(int(PTS[1]), int(PTS[2])), color=(0, 255, 0), thickness=1, lineType=8, shift=0)
+            PTS_pre=list(PTS)
+        if i == 3 :
+            cv2.line(img= grey_img_2, pt1=(int(PTS[1]), int(PTS[2])), pt2=(int(PTS_Start[1]), int(PTS_Start[2])), color=(0, 255, 0), thickness=1, lineType=8, shift=0)
 
 ##=============================================================================
 ##    sCMD=menu.command(cv2,grey_img,Xmenu,Ymenu)  # do not draw image in begin
-
 
     if type(aCMD[0]) is str:
         sCMD=aCMD[0]
@@ -276,18 +188,17 @@ while(True):
 
     if sCMD=='LOAD PTS':
         print('====IMPORT CSV==============================================')
-        print('IMPORT CSV - datapointsWORLD.csv')
-
+        print('IMPORT CSV - MountingFrame_WORLD.csv')
         # Draw Lines of  imported Mounting Frame
-        sPathFile='datapointsWORLD.csv'
-        MP_WORLD=ImportMountingFrame(sPathFile)
+        sPathFile='MountingFrame_WORLD.csv'
+        MountingFrame_WORLD=ImportMountingFrame(sPathFile)
 
     if sCMD=='SAVE PTS':
         print('====EXPORT CSV==============================================')
-        print('EXPORT CSV - datapointsCAM.csv')
-        sPathFile='datapointsCAM.csv'
-        ExportMountingFrame(sPathFile,DataPoints)
-        print(DataPoints)
+        print('EXPORT CSV - MountingFrame_CAMERA.csv')
+        sPathFile='MountingFrame_CAMERA.csv'
+        ExportMountingFrame(sPathFile,MountingFrame_CAMERA)
+        print(MountingFrame_CAMERA)
 
     if sCMD=='SAVE IMG':
         print('====EXPORT CSV==============================================')
@@ -299,8 +210,8 @@ while(True):
     if aCMD[1]=='BL' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
         #MountingFrame_CAMERA= [('TL',1,1),('BL',1,10),('BR',10,10),('TR',10,1)]#mounting frame world
-        MountingFrame_CAMERA[1][1]=aCMD[0][0]
-        MountingFrame_CAMERA[1][2]=aCMD[0][1]
+        MountingFrame_CAMERA[0][1]=aCMD[0][0]
+        MountingFrame_CAMERA[0][2]=aCMD[0][1]
         print(MountingFrame_CAMERA)
         cam_menu.cam_menu.aCMD[2]=cam_menu.cam_menu.aCMD[1]
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
@@ -309,8 +220,8 @@ while(True):
     if aCMD[1]=='BR' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
         #MountingFrame_CAMERA= [('TL',1,1),('BL',1,10),('BR',10,10),('TR',10,1)]#mounting frame world
-        MountingFrame_CAMERA[0][1]=aCMD[0][0]
-        MountingFrame_CAMERA[0][2]=aCMD[0][1]
+        MountingFrame_CAMERA[1][1]=aCMD[0][0]
+        MountingFrame_CAMERA[1][2]=aCMD[0][1]
         print(MountingFrame_CAMERA)
         cam_menu.cam_menu.aCMD[2]=cam_menu.cam_menu.aCMD[1]
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
@@ -336,8 +247,6 @@ while(True):
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
         cam_menu.cam_menu.aCMD[0]="DONE"
 ##=============================================================================
-# write PIXEL
-
 # READ PIXEL
     nDimCroshair=5
     for j in range(-nDimCroshair,nDimCroshair):
@@ -373,48 +282,9 @@ while(True):
     cv2.circle(grey_img_2,(X2[1],Y2[1]), nDimCroshair, (0,255,0),nCircle)
 
 ##    print('Circle LM:',X2[1],Y2[1])
-
 ##=============================================================================
-
 ##    rect = cv2.Rect(x, y, width, height)
 ##    region = image(rect)
-
-    # font
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    # org
-    org = (20, 10)
-    # fontScale
-    fontScale = 0.5
-    # Blue color in BGR
-    color = (0, 255, 0)
-    # Line thickness of 2 px
-    thickness = 1
-    # Using cv2.putText() method
-    sText="..."
-    if MousePointCounter==4:
-            sText='Point TL '
-    if MousePointCounter==1:
-            sText='Point BL '
-    if MousePointCounter==2:
-            sText='Point BR '
-    if MousePointCounter==3:
-            sText='Point TR '
-
-    org = (500, 20)
-    image = cv2.putText(grey_img_2, sONOFF + str(sBrightness), org, font,
-                       fontScale, color, thickness, cv2.LINE_AA)
-    org = (500, 40)
-    image = cv2.putText(grey_img_2, sText + str(MousePointCounter), org, font,fontScale, color, thickness, cv2.LINE_AA)
-
-    org = (200, 40)
-    image = cv2.putText(grey_img_2, sCMD, org, font,
-                       fontScale, color, thickness, cv2.LINE_AA)
-
-    org = (20, height - 20)
-    sMENUE='e- export CSV ; 1 -Imort CSV ; S -Save Images ; q- quit'
-    image = cv2.putText(grey_img_2, sMENUE, org, font,
-                       fontScale, color, thickness, cv2.LINE_AA)
-
 ##=============================================================================
 # KEYSTRIKE COMMANDS
     # EXPORT CSV

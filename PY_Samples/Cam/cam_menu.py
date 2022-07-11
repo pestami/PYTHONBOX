@@ -17,7 +17,7 @@ import csv
 class cam_menu:
 
     ##  Class variables: This variable is shared between all objects of a class
-    menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","FREE 1","FREE 2"]
+    menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","POINTS:" ,"BL","BR","TR","TL"]
     ## command history and command latest
     aCMD=["NULL","QUIT1","QUIT2"]
 
@@ -72,13 +72,18 @@ class cam_menu:
 ##        menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","...."]
         cmd="NULL"
 
-        for i in[0,1,2,3,4]:
+        for i in range(0,self.menue_items-1):
             start_point = (1+spacing_button*i, 1)
             end_point = (1+spacing_button*i+ width_button, height_button)
 
             if (Y< height_button) and (start_point[0] < X < end_point[0]) :
                 cmd=cam_menu.menu[i]
 
+                cam_menu.aCMD[2]=cam_menu.aCMD[1]
+                cam_menu.aCMD[1]=cam_menu.aCMD[0]
+                cam_menu.aCMD[0]=cmd
+        if cmd=="NULL" :
+                cmd=(X,Y)
                 cam_menu.aCMD[2]=cam_menu.aCMD[1]
                 cam_menu.aCMD[1]=cam_menu.aCMD[0]
                 cam_menu.aCMD[0]=cmd
