@@ -66,6 +66,7 @@ def ImportMountingFrame(sPathFile):
 
 MountingFrame_TRANS_WORLD= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]] #mounting frame world
 MountingFrame_CAMERA= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]]#mounting frame world
+LED_TRANS_WORLD= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]] #mounting frame world
 
 #==============================================================================
 ##=============================================================================
@@ -110,6 +111,14 @@ def mousePoints(event,x,y,flags,params):
 ##=============================================================================
 ##========PROGRAM BEGIN========================================================
 ##=============================================================================
+sPathfile_ExportImage1='grey_img_left.png'
+sPathfile_ExportImage2='grey_img_right.png'
+sPathfile_VideoSubstituteImage='grey_img_right.png'
+
+sPathFileImport='MountingFrame_TRANS_WORLD.csv'
+sPathFileExport='MountingFrame_CAMERA.csv'
+sPathFileImportLED_WORLD='LED_TRANS_WORLD.csv'
+
 ## select image source
 image_source = 2
 if image_source==0 :
@@ -120,7 +129,7 @@ if image_source==1 :
      cap = cv2.VideoCapture(1)
 if image_source==2 :
     # FILE
-    cap = cv2.VideoCapture('grey_img.png')
+    cap = cv2.VideoCapture(sPathfile_VideoSubstituteImage)
 #------------------------------------------------------------------------------
 # Get Image with  ?filter?
 if image_source!=2 :
@@ -175,6 +184,11 @@ while(True):
         if i == 3 :
             cv2.line(img= grey_img_2, pt1=(int(PTS[1]), int(PTS[2])), pt2=(int(PTS_Start[1]), int(PTS_Start[2])), color=(0, 255, 0), thickness=1, lineType=8, shift=0)
 
+    for PTS,i in zip(LED_TRANS_WORLD,range(0,len(LED_TRANS_WORLD)-1)):  # zip uses shortes of two lists
+        nDimCroshair=5
+        nCircle=1
+        cv2.circle(grey_img_2,(int(LED_TRANS_WORLD[i][1]),int(LED_TRANS_WORLD[i][2])), nDimCroshair, (0,0,255),nCircle)
+
 ##=============================================================================
 ##    sCMD=menu.command(cv2,grey_img,Xmenu,Ymenu)  # do not draw image in begin
 
@@ -188,27 +202,36 @@ while(True):
         print('====IMPORT CSV==============================================')
         print('IMPORT CSV - MountingFrame_TRANS_WORLD.csv')
         # Draw Lines of  imported Mounting Frame
-        sPathFile='MountingFrame_TRANS_WORLD.csv'
+        sPathFile=sPathFileImport
         MountingFrame_TRANS_WORLD=ImportMountingFrame(sPathFile)
         cam_menu.cam_menu.aCMD[0]="DONE"
+
+    if sCMD=='LOAD LED':
+        print('====IMPORT CSV==============================================')
+        print('IMPORT CSV - LED_TRANS_WORLD.csv')
+        # Draw Lines of  imported Mounting Frame
+        sPathFile=sPathFileImportLED_WORLD
+        LED_TRANS_WORLD=ImportMountingFrame(sPathFile)
+        cam_menu.cam_menu.aCMD[0]="DONE"
+
 
     if sCMD=='SAVE PTS':
         print('====EXPORT CSV==============================================')
         print('EXPORT CSV - MountingFrame_CAMERA.csv')
-        sPathFile='MountingFrame_CAMERA.csv'
+        sPathFile=sPathFileExport
         ExportMountingFrame(sPathFile,MountingFrame_CAMERA)
         print(MountingFrame_CAMERA)
         cam_menu.cam_menu.aCMD[0]="DONE"
 
     if sCMD=='SAVE IMG':
         print('====EXPORT CSV==============================================')
-        print('EXPORT CSV - grey_img_1.png grey_img_2.png')
-##        cv2.imwrite('grey_img_1.png',grey_img)
-        cv2.imwrite('grey_img_2.png',grey_img_2)
+        print('EXPORT CSV - ' , sPathfile_ExportImage1, sPathfile_ExportImage2)
+        cv2.imwrite(sPathfile_ExportImage1,grey_img)
+        cv2.imwrite(sPathfile_ExportImage2,grey_img_2)
         print('EXPORT png')
         cam_menu.cam_menu.aCMD[0]="DONE"
 
-    if aCMD[1]=='BL' and type(aCMD[0]) is tuple:
+    if aCMD[1]=='TL' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
         #MountingFrame_CAMERA= [('TL',1,1),('BL',1,10),('BR',10,10),('TR',10,1)]#mounting frame world
         MountingFrame_CAMERA[0][1]=aCMD[0][0]
@@ -218,17 +241,19 @@ while(True):
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
         cam_menu.cam_menu.aCMD[0]="DONE"
 
-    if aCMD[1]=='BR' and type(aCMD[0]) is tuple:
+
+    if aCMD[1]=='BL' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
         #MountingFrame_CAMERA= [('TL',1,1),('BL',1,10),('BR',10,10),('TR',10,1)]#mounting frame world
         MountingFrame_CAMERA[1][1]=aCMD[0][0]
         MountingFrame_CAMERA[1][2]=aCMD[0][1]
+
         print(MountingFrame_CAMERA)
         cam_menu.cam_menu.aCMD[2]=cam_menu.cam_menu.aCMD[1]
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
         cam_menu.cam_menu.aCMD[0]="DONE"
 
-    if aCMD[1]=='TR' and type(aCMD[0]) is tuple:
+    if aCMD[1]=='BR' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
         #MountingFrame_CAMERA= [('TL',1,1),('BL',1,10),('BR',10,10),('TR',10,1)]#mounting frame world
         MountingFrame_CAMERA[2][1]=aCMD[0][0]
@@ -238,7 +263,7 @@ while(True):
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
         cam_menu.cam_menu.aCMD[0]="DONE"
 
-    if aCMD[1]=='TL' and type(aCMD[0]) is tuple:
+    if aCMD[1]=='TR' and type(aCMD[0]) is tuple:
         print('====NEW BL POINT Detected====================================')
         #MountingFrame_CAMERA= [('TL',1,1),('BL',1,10),('BR',10,10),('TR',10,1)]#mounting frame world
         MountingFrame_CAMERA[3][1]=aCMD[0][0]
@@ -247,6 +272,8 @@ while(True):
         cam_menu.cam_menu.aCMD[2]=cam_menu.cam_menu.aCMD[1]
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
         cam_menu.cam_menu.aCMD[0]="DONE"
+
+
 ##=============================================================================
 # READ PIXEL
     nDimCroshair=5
@@ -298,8 +325,8 @@ while(True):
 
     # SAVE IMAGE
     if cv2.waitKey(1) & 0xFF == ord('s'):
-        cv2.imwrite('grey_img_1.png',grey_img)
-        cv2.imwrite('grey_img_2.png',grey_img_2)
+        cv2.imwrite('grey_img_left.png',grey_img)
+        cv2.imwrite('grey_img_right.png',grey_img_2)
         print('EXPORT png')
         sCMD= 'EXPORTED IMAGES L & R'
     # QUIT

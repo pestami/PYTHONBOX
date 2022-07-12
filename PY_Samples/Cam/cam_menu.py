@@ -17,7 +17,7 @@ import csv
 class cam_menu:
 
     ##  Class variables: This variable is shared between all objects of a class
-    menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","POINTS:" ,"BL","BR","TR","TL"]
+    menu=["QUIT","SAVE PTS","LOAD PTS","LOAD LED","SAVE IMG","POINTS:" ,"BL","BR","TR","TL"]
     ## command history and command latest
     aCMD=["NULL","QUIT1","QUIT2"]
 
@@ -48,7 +48,7 @@ class cam_menu:
 
 ##        menu=["QUIT","SAVE PTS","LOAD PTS","SAVE IMG","...."]
         font = cv2.FONT_HERSHEY_SIMPLEX # font
-        fontScale = 0.4 # fontScale
+        fontScale = 0.3 # fontScale
         thickness = 1 # Line thickness of 2 px
 
         for i in range(0, self.menue_items-1):
