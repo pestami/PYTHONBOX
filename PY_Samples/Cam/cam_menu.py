@@ -17,7 +17,7 @@ import csv
 class cam_menu:
 
     ##  Class variables: This variable is shared between all objects of a class
-    menu=["QUIT","SAVE PTS","LOAD PTS","LOAD LED","SAVE IMG","POINTS:" ,"BL","BR","TR","TL"]
+    menu=["BL","BR","TR","TL","-","SAVE PTS","CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"QUIT"]
     ## command history and command latest
     aCMD=["NULL","QUIT1","QUIT2"]
 
@@ -27,6 +27,7 @@ class cam_menu:
 
         ## class attributes
         self.menue_items=len(self.menu) + 1
+        self.menue_width=int(image.shape[1])
         self.width_button = int(image.shape[1] / self.menue_items)
         self.height_button = int(image.shape[0] / 20)
         self.spacing_button = int(image.shape[1] / self.menue_items)
@@ -50,6 +51,12 @@ class cam_menu:
         font = cv2.FONT_HERSHEY_SIMPLEX # font
         fontScale = 0.3 # fontScale
         thickness = 1 # Line thickness of 2 px
+
+        start_point = (1, 1)
+        end_point = (self.menue_width, height_button)
+        color2 = (200, 200, 200)
+        thickness2 = -1   # Thickness of -1 will fill the entire shape
+        image = cv2.rectangle(image, start_point, end_point, color2, thickness2)
 
         for i in range(0, self.menue_items-1):
                 start_point = (1+spacing_button*i, 1)

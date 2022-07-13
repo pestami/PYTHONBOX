@@ -23,6 +23,7 @@ import csv
 
 import cam_annotate
 import cam_menu
+import subprocess
 ##=============================================================================
 def GetImageDimensions(image):
 
@@ -57,6 +58,7 @@ def ImportMountingFrame(sPathFile):
             for row in csvReader:
                 print('Read CSV:',row)
 
+
                 MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2])]
                 i=i+1
      return MP_WORLD
@@ -66,7 +68,7 @@ def ImportMountingFrame(sPathFile):
 
 MountingFrame_TRANS_WORLD= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]] #mounting frame world
 MountingFrame_CAMERA= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]]#mounting frame world
-LED_TRANS_WORLD= [['TL',1,1],['BL',1,10],['BR',10,10],['TR',10,1]] #mounting frame world
+LED_TRANS_WORLD= [['TL',1,1,5],['BL',1,10,5],['BR',10,10,5],['TR',10,1,5]] #mounting frame world
 
 #==============================================================================
 ##=============================================================================
@@ -113,7 +115,7 @@ def mousePoints(event,x,y,flags,params):
 ##=============================================================================
 sPathfile_ExportImage1='grey_img_left.png'
 sPathfile_ExportImage2='grey_img_right.png'
-sPathfile_VideoSubstituteImage='grey_img_right.png'
+sPathfile_VideoSubstituteImage='grey_img_substitute.png'
 
 sPathFileImport='MountingFrame_TRANS_WORLD.csv'
 sPathFileExport='MountingFrame_CAMERA.csv'
@@ -136,7 +138,7 @@ if image_source!=2 :
     ret, frame = cap.read()
     grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
 else:
-    grey_img = cv2.imread('grey_img.png')
+    grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
 #------------------------------------------------------------------------------
 # Get Image dimensions
 aImageDim=GetImageDimensions(grey_img)
@@ -155,7 +157,7 @@ while(True):
         #grey_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
     else:
-        grey_img = cv2.imread('grey_img_1.png')
+        grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
 #------------------------------------------------------------------------------
     # resize image
     # grey_img = cv2.resize(grey_img, dim, interpolation = cv2.INTER_AREA)
@@ -184,8 +186,8 @@ while(True):
         if i == 3 :
             cv2.line(img= grey_img_2, pt1=(int(PTS[1]), int(PTS[2])), pt2=(int(PTS_Start[1]), int(PTS_Start[2])), color=(0, 255, 0), thickness=1, lineType=8, shift=0)
 
-    for PTS,i in zip(LED_TRANS_WORLD,range(0,len(LED_TRANS_WORLD)-1)):  # zip uses shortes of two lists
-        nDimCroshair=5
+    for PTS,i in zip(LED_TRANS_WORLD,range(0,len(LED_TRANS_WORLD))):  # zip uses shortes of two lists
+        nDimCroshair=10   #LED_TRANS_WORLD[i][3]
         nCircle=1
         cv2.circle(grey_img_2,(int(LED_TRANS_WORLD[i][1]),int(LED_TRANS_WORLD[i][2])), nDimCroshair, (0,0,255),nCircle)
 
@@ -213,6 +215,12 @@ while(True):
         sPathFile=sPathFileImportLED_WORLD
         LED_TRANS_WORLD=ImportMountingFrame(sPathFile)
         cam_menu.cam_menu.aCMD[0]="DONE"
+
+    if sCMD=='CALC':
+        print('====ICalculate Transformations==============================================')
+        print('Transformations.py')
+
+        subprocess.call("Transformations.py", shell=True)
 
 
     if sCMD=='SAVE PTS':

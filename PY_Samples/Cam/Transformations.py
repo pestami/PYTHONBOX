@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        Transformations.py
 # Purpose:
 #
 # Author:      SESA237770
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
         LXgeo=int(PTS_GEOM[0][1]) -int(PTS_GEOM[3][1])
         LXcam=int(PTS_CAM[0][1]) -int(PTS_CAM[3][1])
-        scale= abs(int(LXcam/LXgeo))
+        scale= abs(int(LXcam/LXgeo*100))
 
         offsetX=PTS_CAM[0][1]
         offsetY=PTS_CAM[0][2]
@@ -115,8 +115,8 @@ if __name__ == '__main__':
             PTS_TRANS_WORLD=PTS_GEOM
             for i in range(0,len(PTS_GEOM)):
 
-                tempX=int(PTS_GEOM[i][1])*scale +1*int(offsetX)
-                tempY= int(PTS_GEOM[i][2])*scale +1*int(offsetY)
+                tempX=int(PTS_GEOM[i][1])*scale/100 +1*int(offsetX)
+                tempY= int(PTS_GEOM[i][2])*scale/100 +1*int(offsetY)
                 tempX=str(int(tempX))
                 tempY= str(int(tempY))
 
