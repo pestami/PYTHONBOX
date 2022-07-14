@@ -81,12 +81,15 @@ def StackImages(img,LED_CAMERA):
 
         #roi = image[startY:endY, startX:endX]
         crop = img[cY1:cY2,cX1:cX2 ]
+        crop_grey = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+        #(thresh, crop_BW) = cv2.threshold(crop_grey, 100, 200, cv2.THRESH_BINARY)
+
         print('crop:',cX1,cX2,cY1 ,cY2,LED_CAMERA[i][0])
         if i==0:
-            crop0 = img[1:2, cY1:cY2]
-            LED_stack=np.vstack([crop0, crop])
+            crop0 = crop_grey[1:2, 0:10000 ] #roi = image[startY:endY, startX:endX]
+            LED_stack=np.vstack([crop0, crop_grey])
         else:
-            LED_stack=np.vstack([LED_stack, crop])
+            LED_stack=np.vstack([LED_stack, crop_grey])
      cv2.imshow('LED 1', LED_stack)
 
 #==============================================================================
