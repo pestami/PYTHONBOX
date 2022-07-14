@@ -90,6 +90,8 @@ def StackImages(img,LED_CAMERA):
             LED_stack=np.vstack([crop0, crop_grey])
         else:
             LED_stack=np.vstack([LED_stack, crop_grey])
+
+     cv2.imwrite('LED_Stack.png',LED_stack)
      cv2.imshow('LED 1', LED_stack)
 
 #==============================================================================
