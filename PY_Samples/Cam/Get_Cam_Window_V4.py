@@ -63,6 +63,32 @@ def ImportMountingFrame(sPathFile):
                 i=i+1
      return MP_WORLD
 
+
+#===============================================================================
+def StackImages(img,LED_CAMERA):
+
+     for PTS,i in zip(LED_CAMERA,range(0,len(LED_CAMERA))):  # zip uses shortes of two lists
+
+        LED_X=int(LED_CAMERA[i][1])
+        LED_Y=int(LED_CAMERA[i][2])
+        print('LED XY ',LED_X,LED_Y)
+        nSlice=20
+        cX1=LED_X-nSlice
+        cX2=LED_X+nSlice
+
+        cY1=LED_Y-nSlice
+        cY2=LED_Y+nSlice
+
+        #roi = image[startY:endY, startX:endX]
+        crop = img[cY1:cY2,cX1:cX2 ]
+        print('crop:',cX1,cX2,cY1 ,cY2,LED_CAMERA[i][0])
+        if i==0:
+            crop0 = img[1:2, cY1:cY2]
+            LED_stack=np.vstack([crop0, crop])
+        else:
+            LED_stack=np.vstack([LED_stack, crop])
+     cv2.imshow('LED 1', LED_stack)
+
 #==============================================================================
 # Global Points
 
@@ -120,9 +146,9 @@ sPathfile_VideoSubstituteImage='grey_img_substitute.png'
 sPathFileImport='MountingFrame_TRANS_WORLD.csv'
 sPathFileExport='MountingFrame_CAMERA.csv'
 sPathFileImportLED_WORLD='LED_TRANS_WORLD.csv'
-
-## select image source
-image_source = 2
+#------------------------------------------------------------------------------
+# select image source
+image_source = 1
 if image_source==0 :
     # CAM 0
     cap = cv2.VideoCapture(0)
@@ -134,11 +160,18 @@ if image_source==2 :
     cap = cv2.VideoCapture(sPathfile_VideoSubstituteImage)
 #------------------------------------------------------------------------------
 # Get Image with  ?filter?
-if image_source!=2 :
-    ret, frame = cap.read()
-    grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
-else:
-    grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
+
+##    if image_source!=2 :
+##        ret, frame = cap.read()
+##        grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
+##    else:
+##        grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
+try:
+        ret, frame = cap.read()
+        grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
+except:
+        grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
+
 #------------------------------------------------------------------------------
 # Get Image dimensions
 aImageDim=GetImageDimensions(grey_img)
@@ -149,14 +182,15 @@ print('====PROGRAM MAIN LOOP==================')
 menu=cam_menu.cam_menu(cv2,grey_img)
 
 while(True):
+
 #------------------------------------------------------------------------------
 # Get Image with  ?filter?
-    if image_source!=2 :
+    try:
         ret, frame = cap.read()
         ####    frame = cv2.resize(frame, (400, 400))
         #grey_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
-    else:
+    except:
         grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
 #------------------------------------------------------------------------------
     # resize image
@@ -199,6 +233,20 @@ while(True):
 
     if sCMD=="QUIT":
         break
+
+    if sCMD=='SOURCE':
+        print('====CHANGE VIDEO SOURCE======================================')
+        image_source_pre=image_source
+        print('Change Source', image_source_pre)
+        if image_source==2:
+            image_source=1
+            print('Changed to ', image_source)
+        if image_source==1 and image_source_pre !=2 :
+            image_source=2
+            print('Changed to ', image_source)
+
+        print('New Source', image_source)
+        cam_menu.cam_menu.aCMD[0]="DONE"
 
     if sCMD=='LOAD PTS':
         print('====IMPORT CSV==============================================')
@@ -281,6 +329,14 @@ while(True):
         cam_menu.cam_menu.aCMD[1]=cam_menu.cam_menu.aCMD[0]
         cam_menu.cam_menu.aCMD[0]="DONE"
 
+    if sCMD=='crop':
+        print('====CROP IMAGE==============================================')
+        print('')
+        StackImages(grey_img,LED_TRANS_WORLD)
+        print('LED:',LED_TRANS_WORLD[0])
+##        print('crop:',cX1,cY1, cX2,cY2)
+
+        cam_menu.cam_menu.aCMD[0]="DONE"
 
 ##=============================================================================
 # READ PIXEL

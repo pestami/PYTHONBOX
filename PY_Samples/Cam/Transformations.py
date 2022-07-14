@@ -86,14 +86,18 @@ if __name__ == '__main__':
 
         LXgeo=int(PTS_GEOM[0][1]) -int(PTS_GEOM[3][1])
         LXcam=int(PTS_CAM[0][1]) -int(PTS_CAM[3][1])
-        scale= abs(int(LXcam/LXgeo*100))
+        LYgeo=int(PTS_GEOM[0][2]) -int(PTS_GEOM[2][2])
+        LYcam=int(PTS_CAM[0][2]) -int(PTS_CAM[2][2])
+        scaleX= abs(int(LXcam/LXgeo*100))
+        scaleY= abs(int(LYcam/LYgeo*100))
 
         offsetX=PTS_CAM[0][1]
         offsetY=PTS_CAM[0][2]
 
 
         print('====Transformation Equations====')
-        print('Scale:',scale)
+        print('ScaleX:',scaleX)
+        print('ScaleY:',scaleY)
         print('offsetX:',offsetX)
         print('offsetY:',offsetY)
         print('===============================\n')
@@ -115,8 +119,8 @@ if __name__ == '__main__':
             PTS_TRANS_WORLD=PTS_GEOM
             for i in range(0,len(PTS_GEOM)):
 
-                tempX=int(PTS_GEOM[i][1])*scale/100 +1*int(offsetX)
-                tempY= int(PTS_GEOM[i][2])*scale/100 +1*int(offsetY)
+                tempX=int(PTS_GEOM[i][1])*scaleX/100 +1*int(offsetX)
+                tempY= int(PTS_GEOM[i][2])*scaleY/100 +1*int(offsetY)
                 tempX=str(int(tempX))
                 tempY= str(int(tempY))
 

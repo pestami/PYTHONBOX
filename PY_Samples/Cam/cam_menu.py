@@ -17,7 +17,7 @@ import csv
 class cam_menu:
 
     ##  Class variables: This variable is shared between all objects of a class
-    menu=["BL","BR","TR","TL","-","SAVE PTS","CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"QUIT"]
+    menu=["SOURCE","BL","BR","TR","TL","SAVE PTS","CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"crop","QUIT"]
     ## command history and command latest
     aCMD=["NULL","QUIT1","QUIT2"]
 
@@ -28,9 +28,9 @@ class cam_menu:
         ## class attributes
         self.menue_items=len(self.menu) + 1
         self.menue_width=int(image.shape[1])
-        self.width_button = int(image.shape[1] / self.menue_items)
+        self.width_button = int(image.shape[1] / (self.menue_items-1))
         self.height_button = int(image.shape[0] / 20)
-        self.spacing_button = int(image.shape[1] / self.menue_items)
+        self.spacing_button = int(image.shape[1] / (self.menue_items-1))
         self.color = (100, 0, 100) # Blue color in BGR
         self.thickness = 2 # Line thickness of 2 px
 ##        print("INITIALIZE: width height sapacing",width_button,height_button,spacing_button ) # test = ok
