@@ -20,6 +20,8 @@ if __name__ == '__main__':
 import numpy as np
 import cv2
 import csv
+import sys
+import os
 
 import cam_annotate
 import cam_menu
@@ -65,7 +67,7 @@ def ImportMountingFrame(sPathFile):
 
 
 #===============================================================================
-def StackImages(img,LED_CAMERA):
+def StackImages(img,LED_CAMERA,sPathfile_LED_STACK):
 
      for PTS,i in zip(LED_CAMERA,range(0,len(LED_CAMERA))):  # zip uses shortes of two lists
 
@@ -91,7 +93,7 @@ def StackImages(img,LED_CAMERA):
         else:
             LED_stack=np.vstack([LED_stack, crop_grey])
 
-     cv2.imwrite('LED_Stack.png',LED_stack)
+     cv2.imwrite(sPathfile_LED_STACK,LED_stack)
      cv2.imshow('LED 1', LED_stack)
 
 #==============================================================================
@@ -144,13 +146,33 @@ def mousePoints(event,x,y,flags,params):
 ##=============================================================================
 ##========PROGRAM BEGIN========================================================
 ##=============================================================================
-sPathfile_ExportImage1='grey_img_left.png'
-sPathfile_ExportImage2='grey_img_right.png'
-sPathfile_VideoSubstituteImage='grey_img_substitute.png'
 
-sPathFileImport='MountingFrame_TRANS_WORLD.csv'
-sPathFileExport='MountingFrame_CAMERA.csv'
-sPathFileImportLED_WORLD='LED_TRANS_WORLD.csv'
+
+if len(sys.argv) ==3 :  # 1 st = 1...1000 is a job number 2 is 11 12 22 33 = size of frontplate
+    sJOBprefix=  '0000' + str(sys.argv[1])  #Number
+    sJOBprefix =+ "job" + sJOBprefix[-3:] +'_'+ str(sys.argv[2])+'_'
+
+else:
+    user = os.getlogin()
+    print('User:',user)
+    sJOBprefix=user+'_'
+
+if user=='SESA237770':
+    sPrefix='MPA\\'
+else: sPrefix='OJS\\'
+
+#------------------------------------------------------------------------------
+# select iuser folder
+
+sPathfile_ExportImage1=sPrefix + 'grey_img_left.png'
+sPathfile_ExportImage2=sPrefix + 'grey_img_right.png'
+sPathfile_VideoSubstituteImage=sPrefix + 'grey_img_substitute.png'
+
+sPathFileImport=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
+sPathFileExport=sPrefix + 'MountingFrame_CAMERA.csv'
+sPathFileImportLED_WORLD=sPrefix + 'LED_TRANS_WORLD.csv'
+
+sPathfile_LED_STACK=sJOBprefix + 'LED_Stack.png'
 #------------------------------------------------------------------------------
 # select image source
 image_source = 1
@@ -338,7 +360,7 @@ while(True):
     if sCMD=='crop':
         print('====CROP IMAGE==============================================')
         print('')
-        StackImages(grey_img,LED_TRANS_WORLD)
+        StackImages(grey_img,LED_TRANS_WORLD,sPathfile_LED_STACK)
         print('LED:',LED_TRANS_WORLD[0])
 ##        print('crop:',cX1,cY1, cX2,cY2)
 

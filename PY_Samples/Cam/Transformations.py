@@ -12,6 +12,7 @@
 ##=============================================================================
 import numpy as np
 import csv
+import os
 ##=============================================================================
 def ExportMountingFrame(sPathFile,DataPoints):
     # field names
@@ -51,6 +52,10 @@ def ImportMountingFrame(sPathFile):
 ##=============================================================================
 ##=============================================================================
 def main():
+        user = os.getlogin()
+        if user=='SESA237770':
+            sPrefix='MPA\\'
+        else: sPrefix='OJS\\'
 
         print('')
         print('==============================================================')
@@ -61,12 +66,12 @@ def main():
 
     # IMPORT CSV
     # These points are used to create a transformation equations
-        sPathFileImportCAMERA='MountingFrame_CAMERA.csv'
-        sPathFileImportWORLD='MountingFrame_WORLD.csv'
-        sPathFileImportTRANS_WORLD='MountingFrame_TRANS_WORLD.csv'
+        sPathFileImportCAMERA=sPrefix + 'MountingFrame_CAMERA.csv'
+        sPathFileImportWORLD=sPrefix + 'MountingFrame_WORLD.csv'
+        sPathFileImportTRANS_WORLD=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
 
-        sPathFileImportWORLD2='LED_WORLD.csv'
-        sPathFileImportTRANS_WORLD2='LED_TRANS_WORLD.csv'
+        sPathFileImportWORLD2=sPrefix + 'LED_WORLD.csv'
+        sPathFileImportTRANS_WORLD2=sPrefix + 'LED_TRANS_WORLD.csv'
 
         WORLDS=[sPathFileImportWORLD,sPathFileImportWORLD2]
         TRANS_WORLDS=[sPathFileImportTRANS_WORLD,sPathFileImportTRANS_WORLD2]
