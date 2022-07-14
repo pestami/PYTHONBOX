@@ -272,7 +272,8 @@ while(True):
     if sCMD=='CALC':
         print('====ICalculate Transformations==============================================')
         print('Transformations.py')
-        subprocess.call("Transformations.py", shell=True)
+        import Transformations
+        Transformations.main()
         cam_menu.cam_menu.aCMD[0]="DONE"
 
 
