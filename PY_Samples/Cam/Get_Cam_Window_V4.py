@@ -26,6 +26,7 @@ import os
 import cam_annotate
 import cam_menu
 import subprocess
+from selectproject import DialogProjectChoice
 ##=============================================================================
 def GetImageDimensions(image):
 
@@ -148,18 +149,33 @@ def mousePoints(event,x,y,flags,params):
 ##=============================================================================
 
 
-if len(sys.argv) ==3 :  # 1 st = 1...1000 is a job number 2 is 11 12 22 33 = size of frontplate
-    sJOBprefix=  '0000' + str(sys.argv[1])  #Number
-    sJOBprefix =+ "job" + sJOBprefix[-3:] +'_'+ str(sys.argv[2])+'_'
+##if len(sys.argv) ==3 :  # 1 st = 1...1000 is a job number 2 is 11 12 22 33 = size of frontplate
+##    sJOBprefix=  '0000' + str(sys.argv[1])  #Number
+##    sJOBprefix =+ "job" + sJOBprefix[-3:] +'_'+ str(sys.argv[2])+'_'
+##
+##else:
+##    user = os.getlogin()
+##    print('User:',user)
+##    sJOBprefix=user+'_'
+##
+##if user=='SESA237770':
+##    sPrefix='workspace_MPA\\'
+##else: sPrefix='workspace_OJS\\'
 
-else:
-    user = os.getlogin()
-    print('User:',user)
-    sJOBprefix=user+'_'
+# Choose WORKSPACE"
 
-if user=='SESA237770':
-    sPrefix='MPA\\'
-else: sPrefix='OJS\\'
+sJOBprefix='job_'
+
+sPrefix='workspace_MPA\\'
+sPrefix='workspace_OJS\\'
+sPrefix='workspace_2X2\\'
+sPrefix='workspace_1X2\\'
+
+sPrefix='workspace_2X2\\'
+
+oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2"])
+sPrefix = oDialog.Show()
+sPrefix+='\\'
 
 #------------------------------------------------------------------------------
 # select iuser folder

@@ -16,7 +16,7 @@ import cv2
 # create a black image
 img = np.zeros([200,350,3], np.uint8)
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 cv2.namedWindow('BGR')
 # define a null callback function for Trackbar

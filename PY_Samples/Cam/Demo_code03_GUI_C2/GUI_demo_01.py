@@ -40,7 +40,7 @@ def main():
     # create the window and show it without the plot
     window = sg.Window('OpenCV Integration', layout, location=(800, 400))
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     while True:
         event, values = window.read(timeout=20)

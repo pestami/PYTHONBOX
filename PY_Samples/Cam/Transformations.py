@@ -16,23 +16,19 @@ import os
 ##=============================================================================
 def ExportMountingFrame(sPathFile,DataPoints):
     # field names
-##    fields = ['POSITION', 'X', 'Y']
-
+    ##    fields = ['POSITION', 'X', 'Y']
     # data rows of csv file
-##    DataPoints = [
-##
-##             ['BL', 'COE', '2', '9.1'],
-##             ['BR', 'IT', '2', '9.3'],
-##             ['TR', 'SE', '1', '9.5'],
-##             ['TL', 'COE', '2', '9.0'],
-##            ]
-
+    ##    DataPoints = [
+    ##
+    ##             ['BL', 'COE', '2', '9.1'],
+    ##             ['BR', 'IT', '2', '9.3'],
+    ##             ['TR', 'SE', '1', '9.5'],
+    ##             ['TL', 'COE', '2', '9.0'],
+    ##            ]
     with open(sPathFile, 'w',newline='') as f:
-
         # using csv.writer method from CSV package
         write = csv.writer(f)
-
-##        write.writerow(fields)
+    ##        write.writerow(fields)
         write.writerows(DataPoints )
 
 def ImportMountingFrame(sPathFile):
@@ -47,15 +43,78 @@ def ImportMountingFrame(sPathFile):
                 MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2])]
                 i=i+1
      return MP_WORLD
+#========================================================
+#========================================================
+class transformation:
+    ##  Class variables: This variable is shared between all objects of a class
+    PTS_CAM=[['POSITION', 'X', 'Y']]
+    PTS_GEOM =[['POSITION', 'X', 'Y']]
+    PTS_WORLD_IN_CAM = [['POSITION', 'X', 'Y']]
 
+    sPathFileCAM=''
+    sPathFileWORLD=''
+#========================================================
+    def __init__(self, sPathFileCAM,sPathFileWORLD):
+
+        ## class attributes
+        self.XY_World=[['POSITION', 'X', 'Y']]
+        self.sPathFileWORLD =[['POSITION', 'X', 'Y']]
+        self.sPathFileCAM=sPathFileCAM
+        self.sPathFileWORLD=sPathFileWORLD
+
+#-------------------------------------------------------
+    def transform_WORLD_IN_CAM_byscale(self,PTS_GEOM,PTS_CAM):
+
+        print('=====transform_World_to_CAM_by_scale========================')
+        print('')
+
+        LXgeo=int(PTS_GEOM[0][1]) -int(PTS_GEOM[3][1])
+        LXcam=int(PTS_CAM[0][1]) -int(PTS_CAM[3][1])
+        LYgeo=int(PTS_GEOM[0][2]) -int(PTS_GEOM[2][2])
+        LYcam=int(PTS_CAM[0][2]) -int(PTS_CAM[2][2])
+        scaleX= abs(int(LXcam/LXgeo*100))
+        scaleY= abs(int(LYcam/LYgeo*100))
+
+        offsetX=PTS_CAM[0][1]
+        offsetY=PTS_CAM[0][2]
+
+        for item_in,item_out in zip(PTS_GEOM,PTS_CAM):
+
+            for i in range(0,len(XY_World)):
+
+                tempX=int(PTS_GEOM[i][1])*scaleX/100 +1*int(offsetX)
+                tempY= int(PTS_GEOM[i][2])*scaleY/100 +1*int(offsetY)
+                tempX=str(int(tempX))
+                tempY= str(int(tempY))
+
+                PTS_WORLD_IN_CAM[i]=(PTS_GEOM[i][0], tempX,tempY )
+
+        print('===========================================================')
+
+
+        return PTS_WORLD_IN_CAM
+#----------------------------------------------------------
 ##=============================================================================
 ##=============================================================================
 ##=============================================================================
 def main():
-        user = os.getlogin()
-        if user=='SESA237770':
-            sPrefix='MPA\\'
-        else: sPrefix='OJS\\'
+##        user = os.getlogin()
+##        if user=='SESA237770':
+##            sPrefix='MPA\\'
+##        else: sPrefix='OJS\\'
+
+
+        # Choose WORKSPACE"
+
+        sJOBprefix='job_'
+
+        sPrefix='workspace_MPA\\'
+        sPrefix='workspace_OJS\\'
+        sPrefix='workspace_2X2\\'
+        sPrefix='workspace_1X2\\'
+
+        sPrefix='workspace_2X2\\'
+
 
         print('')
         print('==============================================================')
@@ -141,7 +200,31 @@ def main():
             print('')
         print('===========================================================')
 
-
-
-
 ##=============================================================================
+
+if __name__ == '__main__':
+
+    main()
+
+    print('')
+    print('==============================================================')
+    print('====TEST THE PROGRAM =======================')
+    print('==============================================================')
+    print('')
+
+    sPrefix='MPA\\'
+    sPathFileImport=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
+    sPathFileExport=sPrefix + 'MountingFrame_CAMERA.csv'
+
+    sPathFileCAM=sPathFileImport
+    sPathFileWORLD=sPathFileExport
+
+    print( 'PATHS = ' , sPathFileCAM )
+    print( 'PATHS = ' , sPathFileWORLD )
+
+    TRANS=transformation(sPathFileCAM,sPathFileWORLD)
+    print( 'Trans. = ' , TRANS.sPathFileCAM )
+    print( 'Trans. = ' , TRANS.sPathFileWORLD )
+##    transform_WORLD_IN_CAM_byscale(self,PTS_GEOM,PTS_CAM)
+
+
