@@ -75,8 +75,8 @@ class transformation:
         [float(PTS_GEOM[1][1]),float(PTS_GEOM[1][2]),0,0,1,0],
         [0,0,float(PTS_GEOM[1][1]),float(PTS_GEOM[1][2]),0,1],
 
-        [0,0,float(PTS_GEOM[2][1]),float(PTS_GEOM[2][2]),1,0],
-        [float(PTS_GEOM[2][1]),float(PTS_GEOM[2][2]),0,0,0,1]]
+        [float(PTS_GEOM[2][1]),float(PTS_GEOM[2][2]),0,0,1,0],
+        [0,0,float(PTS_GEOM[2][1]),float(PTS_GEOM[2][2]),0,1]]
 
         POINTSi=[
         float(PTS_CAM[0][1]),
@@ -109,7 +109,7 @@ class transformation:
         self.Tij=np.array([[Mi[0],Mi[1]],[Mi[2],Mi[3]]])
         self.Di=np.array([Mi[4],Mi[5]])
 
-        if 1==1 :
+        if 1==2 :
             self.Tij=np.array([[1,0],[0,1]])
             self.Di=np.array([0,0])
 

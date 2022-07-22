@@ -108,8 +108,8 @@ def main(sPrefix_in):
         oTRANS.Build_TransMatrix_scaling(LL_PTS_CAM_FRAME,LL_PTS_GEOM_FRAME)
         if 1==2 :  # debug
             oTRANS.Build_TransMatrix_scaling(LL_PTS_CAM_FRAME,LL_PTS_CAM_FRAME)
-        if 1==2 :  # flag
-            Build_TransMatrix_elastic(LL_PTS_CAM_FRAME,LL_PTS_GEOM_FRAME)
+        if 1==1 :  # flag
+            oTRANS.Build_TransMatrix_elastic(LL_PTS_CAM_FRAME,LL_PTS_GEOM_FRAME)
 
         print('\n====Transformation Equations====')
         print('',LL_PTS_CAM_FRAME)

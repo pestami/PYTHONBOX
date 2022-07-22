@@ -37,11 +37,13 @@ class DialogProjectChoice:
                 label.config(text = selection)
                 nSELECT= var.get()
                 if nSELECT ==1 :
-                    self.sSelection="workspace_1X2"
+                    self.sSelection=self.sProjectList[0]
                 if nSELECT ==2 :
-                    self.sSelection="workspace_1X2_ojs"
+                    self.sSelection=self.sProjectList[1]
                 if nSELECT ==3 :
-                    self.sSelection="workspace_2x2"
+                    self.sSelection=self.sProjectList[2]
+                if nSELECT ==4 :
+                    self.sSelection=self.sProjectList[3]
 
             R1 = Radiobutton(root, text=self.sProjectList[0], variable=var, value=1, command=sel)
             R1.pack( anchor = W )
@@ -51,6 +53,9 @@ class DialogProjectChoice:
 
             R3 = Radiobutton(root, text=self.sProjectList[2], variable=var, value=3, command=sel)
             R3.pack( anchor = W)
+
+            R4 = Radiobutton(root, text=self.sProjectList[3], variable=var, value=4, command=sel)
+            R4.pack( anchor = W)
 
 
             label = Label(root)
@@ -63,7 +68,7 @@ class DialogProjectChoice:
 
 def main():
 
-    oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2"])
+    oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2","workspace_2x2_Elastic"])
 
     sPrefix = oDialog.Show()
 
