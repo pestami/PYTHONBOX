@@ -59,26 +59,18 @@ class DialogProjectChoice:
 
             return self.sSelection
 
-
-
-
 #===============================================================================
 
 def main():
-
-
 
     oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2"])
 
     sPrefix = oDialog.Show()
 
-
     print("Projects:", oDialog.sProjectList)
     print("Projects Selected:", sPrefix)
 
     pass
-
-
 
 if __name__ == '__main__':
     main()

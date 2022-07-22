@@ -148,7 +148,6 @@ def mousePoints(event,x,y,flags,params):
 ##========PROGRAM BEGIN========================================================
 ##=============================================================================
 
-
 ##if len(sys.argv) ==3 :  # 1 st = 1...1000 is a job number 2 is 11 12 22 33 = size of frontplate
 ##    sJOBprefix=  '0000' + str(sys.argv[1])  #Number
 ##    sJOBprefix =+ "job" + sJOBprefix[-3:] +'_'+ str(sys.argv[2])+'_'
@@ -162,16 +161,14 @@ def mousePoints(event,x,y,flags,params):
 ##    sPrefix='workspace_MPA\\'
 ##else: sPrefix='workspace_OJS\\'
 
+#------------------------------------------------------------------------------
 # Choose WORKSPACE"
-
 sJOBprefix='job_'
-
-sPrefix='workspace_MPA\\'
-sPrefix='workspace_OJS\\'
-sPrefix='workspace_2X2\\'
-sPrefix='workspace_1X2\\'
-
-sPrefix='workspace_2X2\\'
+##sPrefix='workspace_MPA\\'
+##sPrefix='workspace_OJS\\'
+##sPrefix='workspace_2X2\\'
+##sPrefix='workspace_1X2\\'
+##sPrefix='workspace_2X2\\'
 
 oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2"])
 sPrefix = oDialog.Show()
@@ -219,11 +216,15 @@ except:
 # Get Image dimensions
 aImageDim=GetImageDimensions(grey_img)
 #------------------------------------------------------------------------------
-print('====PROGRAM START========================')
-print('====PROGRAM MAIN LOOP==================')
-
+# build menu
+# TO DO  munue items declared here :
 menu=cam_menu.cam_menu(cv2,grey_img)
 
+################################################################################
+#------------------------------------------------------------------------------
+print('====PROGRAM START========================')
+print('====PROGRAM MAIN LOOP====================')
+################################################################################
 while(True):
 
 #------------------------------------------------------------------------------
@@ -241,8 +242,8 @@ while(True):
     grey_img_2 = grey_img.copy()
     grey_img=menu.draw(cv2,grey_img)
 ##=============================================================================
-
-    #MountingFrame_CAMERA = [['TL', 358, 352], ['BL', 266, 248], ['BR', 446, 155], ['TR', 410, 114]]  #BGR
+# TODO code must be moved to anotiations module
+#MountingFrame_CAMERA = [['TL', 358, 352], ['BL', 266, 248], ['BR', 446, 155], ['TR', 410, 114]]  #BGR
     for PTS,i in zip(MountingFrame_CAMERA,[0,1,2,3]):  # zip uses shortes of two lists
         if i== 0:
             PTS_Start=list(PTS)
@@ -311,7 +312,7 @@ while(True):
         print('====ICalculate Transformations==============================================')
         print('Transformations.py')
         import Transformations
-        Transformations.main()
+        Transformations.main(sPrefix)
         cam_menu.cam_menu.aCMD[0]="DONE"
 
 
@@ -383,6 +384,7 @@ while(True):
         cam_menu.cam_menu.aCMD[0]="DONE"
 
 ##=============================================================================
+# TO DO CODE must be replaced:
 # READ PIXEL
     nDimCroshair=5
     for j in range(-nDimCroshair,nDimCroshair):
@@ -447,6 +449,12 @@ while(True):
     cv2.setMouseCallback('frame', mousePoints)
 
 ##=============================================================================
+#------------------------------------------------------------------------------
+print('====END PROGRAM E========================')
+print('====END PROGRAM MAIN LOOP====================')
+################################################################################
+################################################################################
+################################################################################
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()

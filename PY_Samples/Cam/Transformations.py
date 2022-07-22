@@ -13,6 +13,7 @@
 import numpy as np
 import csv
 import os
+from module_transformations import transformation
 ##=============================================================================
 def ExportMountingFrame(sPathFile,DataPoints):
     # field names
@@ -45,59 +46,12 @@ def ImportMountingFrame(sPathFile):
      return MP_WORLD
 #========================================================
 #========================================================
-class transformation:
-    ##  Class variables: This variable is shared between all objects of a class
-    PTS_CAM=[['POSITION', 'X', 'Y']]
-    PTS_GEOM =[['POSITION', 'X', 'Y']]
-    PTS_WORLD_IN_CAM = [['POSITION', 'X', 'Y']]
 
-    sPathFileCAM=''
-    sPathFileWORLD=''
-#========================================================
-    def __init__(self, sPathFileCAM,sPathFileWORLD):
-
-        ## class attributes
-        self.XY_World=[['POSITION', 'X', 'Y']]
-        self.sPathFileWORLD =[['POSITION', 'X', 'Y']]
-        self.sPathFileCAM=sPathFileCAM
-        self.sPathFileWORLD=sPathFileWORLD
-
-#-------------------------------------------------------
-    def transform_WORLD_IN_CAM_byscale(self,PTS_GEOM,PTS_CAM):
-
-        print('=====transform_World_to_CAM_by_scale========================')
-        print('')
-
-        LXgeo=int(PTS_GEOM[0][1]) -int(PTS_GEOM[3][1])
-        LXcam=int(PTS_CAM[0][1]) -int(PTS_CAM[3][1])
-        LYgeo=int(PTS_GEOM[0][2]) -int(PTS_GEOM[2][2])
-        LYcam=int(PTS_CAM[0][2]) -int(PTS_CAM[2][2])
-        scaleX= abs(int(LXcam/LXgeo*100))
-        scaleY= abs(int(LYcam/LYgeo*100))
-
-        offsetX=PTS_CAM[0][1]
-        offsetY=PTS_CAM[0][2]
-
-        for item_in,item_out in zip(PTS_GEOM,PTS_CAM):
-
-            for i in range(0,len(XY_World)):
-
-                tempX=int(PTS_GEOM[i][1])*scaleX/100 +1*int(offsetX)
-                tempY= int(PTS_GEOM[i][2])*scaleY/100 +1*int(offsetY)
-                tempX=str(int(tempX))
-                tempY= str(int(tempY))
-
-                PTS_WORLD_IN_CAM[i]=(PTS_GEOM[i][0], tempX,tempY )
-
-        print('===========================================================')
-
-
-        return PTS_WORLD_IN_CAM
 #----------------------------------------------------------
 ##=============================================================================
 ##=============================================================================
 ##=============================================================================
-def main():
+def main(sPrefix_in):
 ##        user = os.getlogin()
 ##        if user=='SESA237770':
 ##            sPrefix='MPA\\'
@@ -105,15 +59,7 @@ def main():
 
 
         # Choose WORKSPACE"
-
-        sJOBprefix='job_'
-
-        sPrefix='workspace_MPA\\'
-        sPrefix='workspace_OJS\\'
-        sPrefix='workspace_2X2\\'
-        sPrefix='workspace_1X2\\'
-
-        sPrefix='workspace_2X2\\'
+        sPrefix=sPrefix_in
 
 
         print('')
@@ -125,92 +71,116 @@ def main():
 
     # IMPORT CSV
     # These points are used to create a transformation equations
-        sPathFileImportCAMERA=sPrefix + 'MountingFrame_CAMERA.csv'
-        sPathFileImportWORLD=sPrefix + 'MountingFrame_WORLD.csv'
-        sPathFileImportTRANS_WORLD=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
+        sPathFileImport_FRAME_CAMERA=sPrefix + 'MountingFrame_CAMERA.csv'
+        sPathFileImport_FRAME_WORLD=sPrefix + 'MountingFrame_WORLD.csv'
+        sPathFileImport_FRAME_TRANS_WORLD=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
 
-        sPathFileImportWORLD2=sPrefix + 'LED_WORLD.csv'
-        sPathFileImportTRANS_WORLD2=sPrefix + 'LED_TRANS_WORLD.csv'
+        sPathFileImport_LED_WORLD=sPrefix + 'LED_WORLD.csv'
+        sPathFileImport_TRANS_LED_WORLD=sPrefix + 'LED_TRANS_WORLD.csv'
 
-        WORLDS=[sPathFileImportWORLD,sPathFileImportWORLD2]
-        TRANS_WORLDS=[sPathFileImportTRANS_WORLD,sPathFileImportTRANS_WORLD2]
+##        WORLDS=[sPathFileImportWORLD,sPathFileImportWORLD2]
+##        TRANS_WORLDS=[sPathFileImportTRANS_WORLD,sPathFileImportTRANS_WORLD2]
 
         print('====IMPORT CSV==============================================')
-        print('IMPORT CSV MountingFrame Points from CAMERA   PTS_CAM')
-        sPathFile=sPathFileImportCAMERA
-        PTS_CAM=ImportMountingFrame(sPathFile)
+        print('IMPORT CSV MountingFrame Points from CAMERA   PTS_CAM_FRAME')
+        sPathFile=sPathFileImport_FRAME_CAMERA
+        PTS_CAM_FRAME=ImportMountingFrame(sPathFile)
 ##        print(PTS_CAM)
 
         print('====IMPORT CSV==============================================')
-        print('IMPORT WORLD MountingFrame Points from WORLD   PTS_GEOM')
-        sPathFile=sPathFileImportWORLD
-        PTS_GEOM=ImportMountingFrame(sPathFile)
+        print('IMPORT WORLD MountingFrame Points from WORLD   PTS_GEOM_FRAME')
+        sPathFile=sPathFileImport_FRAME_WORLD
+        PTS_GEOM_FRAME=ImportMountingFrame(sPathFile)
 ##        print(PTS_PIXEL_GEOM)
-        print('')
 
-        LXgeo=int(PTS_GEOM[0][1]) -int(PTS_GEOM[3][1])
-        LXcam=int(PTS_CAM[0][1]) -int(PTS_CAM[3][1])
-        LYgeo=int(PTS_GEOM[0][2]) -int(PTS_GEOM[2][2])
-        LYcam=int(PTS_CAM[0][2]) -int(PTS_CAM[2][2])
-        scaleX= abs(int(LXcam/LXgeo*100))
-        scaleY= abs(int(LYcam/LYgeo*100))
-
-        offsetX=PTS_CAM[0][1]
-        offsetY=PTS_CAM[0][2]
+        print('====IMPORT CSV==============================================')
+        print('IMPORT WORLD LED Points from WORLD   PTS_GEOM_LED')
+        sPathFile=sPathFileImport_LED_WORLD
+        PTS_GEOM_LED=ImportMountingFrame(sPathFile)
+##        print(PTS_PIXEL_GEOM)
 
 
-        print('====Transformation Equations====')
-        print('ScaleX:',scaleX)
-        print('ScaleY:',scaleY)
-        print('offsetX:',offsetX)
-        print('offsetY:',offsetY)
+
+        LL_PTS_CAM_FRAME = [list(ele) for ele in PTS_CAM_FRAME]
+        LL_PTS_GEOM_FRAME = [list(ele) for ele in PTS_GEOM_FRAME]
+        oTRANS=transformation(LL_PTS_CAM_FRAME,LL_PTS_GEOM_FRAME)
+
+        oTRANS.Build_TransMatrix_scaling(LL_PTS_CAM_FRAME,LL_PTS_GEOM_FRAME)
+        if 1==2 :  # debug
+            oTRANS.Build_TransMatrix_scaling(LL_PTS_CAM_FRAME,LL_PTS_CAM_FRAME)
+        if 1==2 :  # flag
+            Build_TransMatrix_elastic(LL_PTS_CAM_FRAME,LL_PTS_GEOM_FRAME)
+
+        print('\n====Transformation Equations====')
+        print('',LL_PTS_CAM_FRAME)
+        print('',LL_PTS_GEOM_FRAME)
+
+        print('TRANSFORMATION MATRICES')
+        print('MATRIX Tij= ')
+        print(oTRANS.Tij)
+        print('MATRIX Di= \n',oTRANS.Di)
         print('===============================\n')
 
+
+        PTS_TRANS_GEOM_LED=PTS_GEOM_LED.copy()
+
+#------DATA STRUCTURE CONVERSION   LIST TUPLES  to LIST LIST
+# https://www.geeksforgeeks.org/python-convert-list-of-lists-to-tuple-of-tuples/
+# https://www.geeksforgeeks.org/python-convert-list-of-tuples-to-list-of-list/
+
+##          [('LED_OFF', '50', '25'),
+##          ('LED01', '40', '38'),
+##          ('LED02', '100', '38'),
+##          ('LED03', '20', '47')]
+
+##                [['TL', '42', '58'],
+##                 ['BL', '42', '157'],
+##                 ['BR', '199', '162'],
+##                 ['TR', '203', '57'] ]
+#------DATA STRUCTURE CONVERSION   LIST LIST to  LIST TUPLES
+
+        LL_PTS_GEOM_LED = [list(ele) for ele in PTS_GEOM_LED]
+        LL_PTS_TRANS_GEOM_LED =  oTRANS.transform_WORLD_TO_CAM(LL_PTS_GEOM_LED)
+        PTS_TRANS_GEOM_LED=res = list(tuple(sub) for sub in LL_PTS_TRANS_GEOM_LED)
+
+        LL_PTS_GEOM_FRAME = [list(ele) for ele in PTS_GEOM_FRAME]
+        LL_PTS_TRANS_GEOM_FRAME =  oTRANS.transform_WORLD_TO_CAM(LL_PTS_GEOM_FRAME)
+        PTS_TRANS_GEOM_FRAME=res = list(tuple(sub) for sub in LL_PTS_TRANS_GEOM_FRAME)
+
+
+        print('====EXPORT CSV==========')
+        print('EXPORT TRANS FRAME CAMERA')
+        sPathFile=sPathFileImport_FRAME_TRANS_WORLD
+        print('File:', sPathFile)
+        ExportMountingFrame(sPathFile,PTS_TRANS_GEOM_FRAME)
+        [print(i) for i in PTS_TRANS_GEOM_FRAME]
         print('')
-        print('==============================================================')
-        print('====ITTERATION ALL POIT SETS FROM WORLD=======================')
-        print('==============================================================')
+        print('===========================================================')
+
+
+
+        print('====EXPORT CSV==========')
+        print('EXPORT TRANS LED GEOMETRY')
+        sPathFile=sPathFileImport_TRANS_LED_WORLD
+        print('File:', sPathFile)
+        ExportMountingFrame(sPathFile,PTS_TRANS_GEOM_LED)
+        [print(i) for i in PTS_TRANS_GEOM_LED]
         print('')
-        for item_in,item_out in zip(WORLDS,TRANS_WORLDS):
-            print('====IMPORT CSV======')
-            print('IMPORT WORLD POINTS')
-            sPathFile=sPathFileImportWORLD
-            PTS_GEOM=ImportMountingFrame(item_in)
-    ##        print(PTS_PIXEL_GEOM)
-            print('')
-
-
-            PTS_TRANS_WORLD=PTS_GEOM
-            for i in range(0,len(PTS_GEOM)):
-
-                tempX=int(PTS_GEOM[i][1])*scaleX/100 +1*int(offsetX)
-                tempY= int(PTS_GEOM[i][2])*scaleY/100 +1*int(offsetY)
-                tempX=str(int(tempX))
-                tempY= str(int(tempY))
-
-                PTS_TRANS_WORLD[i]=(PTS_GEOM[i][0], tempX,tempY )
-
-            print('====EXPORT CSV==========')
-            print('EXPORT TRANS WORLD')
-            sPathFile=item_out
-            print('File:', sPathFile)
-            ExportMountingFrame(sPathFile,PTS_TRANS_WORLD)
-            [print(i) for i in PTS_TRANS_WORLD]
-##            print(PTS_TRANS_WORLD)
-            print('')
         print('===========================================================')
 
 ##=============================================================================
+##=============================================================================
 
 if __name__ == '__main__':
-
-    main()
 
     print('')
     print('==============================================================')
     print('====TEST THE PROGRAM =======================')
     print('==============================================================')
     print('')
+
+    sPrefix='workspace_1X2'+'\\'
+    main(sPrefix)
 
     sPrefix='MPA\\'
     sPathFileImport=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
@@ -222,9 +192,7 @@ if __name__ == '__main__':
     print( 'PATHS = ' , sPathFileCAM )
     print( 'PATHS = ' , sPathFileWORLD )
 
-    TRANS=transformation(sPathFileCAM,sPathFileWORLD)
-    print( 'Trans. = ' , TRANS.sPathFileCAM )
-    print( 'Trans. = ' , TRANS.sPathFileWORLD )
+
 ##    transform_WORLD_IN_CAM_byscale(self,PTS_GEOM,PTS_CAM)
 
 
