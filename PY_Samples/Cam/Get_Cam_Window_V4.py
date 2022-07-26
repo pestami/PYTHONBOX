@@ -170,7 +170,7 @@ sJOBprefix='job_'
 ##sPrefix='workspace_1X2\\'
 ##sPrefix='workspace_2X2\\'
 
-oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2","workspace_1X2_Elastic"])
+oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2","workspace_1X2_Elastic","workspace_1X2_Perspective"])
 sPrefix = oDialog.Show()
 sPrefix+='\\'
 
