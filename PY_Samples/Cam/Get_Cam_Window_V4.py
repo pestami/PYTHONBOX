@@ -59,10 +59,13 @@ def ImportMountingFrame(sPathFile):
             i=0
             MP_WORLD=[]
             for row in csvReader:
-                print('Read CSV:',row)
+                print(row)
 
+                if len(row)==4 :
+                    MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2],row[3])]
+                if len(row)==3 :
+                    MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2])]
 
-                MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2])]
                 i=i+1
      return MP_WORLD
 
@@ -74,8 +77,10 @@ def StackImages(img,LED_CAMERA,sPathfile_LED_STACK):
 
         LED_X=int(LED_CAMERA[i][1])
         LED_Y=int(LED_CAMERA[i][2])
+        LED_R=int(LED_CAMERA[i][3])
+
         print('LED XY ',LED_X,LED_Y)
-        nSlice=20
+        nSlice=10
         cX1=LED_X-nSlice
         cX2=LED_X+nSlice
 
@@ -84,18 +89,44 @@ def StackImages(img,LED_CAMERA,sPathfile_LED_STACK):
 
         #roi = image[startY:endY, startX:endX]
         crop = img[cY1:cY2,cX1:cX2 ]
-        crop_grey = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-        #(thresh, crop_BW) = cv2.threshold(crop_grey, 100, 200, cv2.THRESH_BINARY)
+
+        flag=3  # fails if picture matrix not compatable
+
+        if flag==0 :
+            crop_grey = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            crop_post_process=crop_grey
+        if flag==1 :
+            crop_grey = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            crop_post_process=crop_grey
+        if flag==2 :
+            (thresh, crop_BW) = cv2.threshold(crop_grey, 100, 200, cv2.THRESH_BINARY)
+            crop_post_process=crop_BW
+        if flag==3 :
+            crop_post_process=crop
+
+        crop_avg_color_row=np.average(crop_post_process, axis=0)
+        crop_avg_color = np.average(crop_avg_color_row, axis=0)
+
+        Color_img = np.ones((nSlice*2,nSlice*2,3), dtype=np.uint8)
+        Color_img[:,:] = crop_avg_color
+
+
+
+        print('Average Color:', i,crop_avg_color)
 
         print('crop:',cX1,cX2,cY1 ,cY2,LED_CAMERA[i][0])
         if i==0:
-            crop0 = crop_grey[1:2, 0:10000 ] #roi = image[startY:endY, startX:endX]
-            LED_stack=np.vstack([crop0, crop_grey])
+            crop0 = crop_post_process[1:2, 0:10000 ] #roi = image[startY:endY, startX:endX]
+            LED_stack=np.vstack([crop0, crop_post_process]) # cv2.COLOR_BGR2GRAY
+            LED_stack_average=np.vstack([crop0, Color_img])
+
         else:
-            LED_stack=np.vstack([LED_stack, crop_grey])
+            LED_stack=np.vstack([LED_stack, crop_post_process])
+            LED_stack_average=np.vstack([LED_stack_average, Color_img])
 
      cv2.imwrite(sPathfile_LED_STACK,LED_stack)
      cv2.imshow('LED 1', LED_stack)
+     cv2.imshow('LED 2', LED_stack_average)
 
 #==============================================================================
 # Global Points

@@ -139,6 +139,10 @@ class transformation:
                 PTS_CAM[i][1]= str(int(x2j[0]))
 
                 PTS_CAM[i][2]= str(int(x2j[1]))
+
+                if len(PTS_GEOM[0])==4:
+                    PTS_CAM[i][3]= str(int(float(PTS_GEOM[i][3]) *(self.Tij[0][0] + self.Tij[1][1])/2   ))
+
         print('===========================================================')
 
 
@@ -177,7 +181,7 @@ def main():
     ['TR', '140', '0'] ]
 
 # test for unity matrix
-    if 1==1:
+    if 1==2:
      PTS_GEOM = PTS_CAM.copy()
 
 

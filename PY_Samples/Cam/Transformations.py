@@ -41,7 +41,11 @@ def ImportMountingFrame(sPathFile):
             for row in csvReader:
                 print(row)
 
-                MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2])]
+                if len(row)==4 :
+                    MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2],row[3])]
+                if len(row)==3 :
+                    MP_WORLD=  MP_WORLD + [(row[0],row[1],row[2])]
+
                 i=i+1
      return MP_WORLD
 #========================================================
