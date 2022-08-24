@@ -30,7 +30,7 @@ def main():
 
 #==================================================================
     image = Image.open('image.png')
-
+    imageXLSX="image.xlsx"
     # summarize some details about the image
     print(image.format)
     print(image.size)
@@ -60,7 +60,7 @@ def main():
 #==================================================================
 #==================================================================
 #==================================================================
-    wb = openpyxl.load_workbook("image.xlsx")
+    wb = openpyxl.load_workbook(imageXLSX)
     ws = wb['image'] #Name of the working sheet
 
     fill_cell1 = PatternFill(patternType='solid',fgColor='FC2C03')
@@ -75,11 +75,8 @@ def main():
 
 #==================================================================
 #==================================================================
-
-
-
 #==================================================================
-
+    print('===BEGIN COLOR LOOP===')
         # data
 ##    print(numpydata)
     nrow=0
@@ -91,35 +88,55 @@ def main():
             ncol+=1
 
 
-
+            sRGB='FFFFFF'
             sRGB=rgb_to_hex((Y[0], Y[1], Y[2]))
             sRGB=sRGB.upper()
 
-##            print(nrow,ncol,':',sRGB,Y[0], Y[1], Y[2])
+##            print(nrow,ncol,'sRGB=',sRGB,'R G B =',Y[0], Y[1], Y[2])
 
-
-##            fill_cell1 = PatternFill(patternType='solid',fgColor=sRGB)
-##            ws.cell(row=nrow, column=ncol).fill = PatternFill("solid",sRGB)
+##            ws.cell(row=nrow, column=ncol).value = Y
             ws.cell(row=nrow, column=ncol).value = sRGB
+
+            #===works with image size = 300 x 150
+            del fill_cell1
+            fill_cell1 = PatternFill(patternType='solid',fgColor=sRGB)
+            ws.cell(row=nrow, column=ncol).fill = fill_cell1
+
+
+            if 1==2 :
+##                fill_cell1 = PatternFill(patternType='solid',fgColor=sRGB)
+##                ws.cell(row=nrow, column=ncol).fill = PatternFill("solid",sRGB)
+##                sheet['A1'].fill = PatternFill(bgColor=sRGB, fill_type = "solid")
+                ws.cell(row=nrow, column=ncol).fill = PatternFill(start_color=sRGB,end_color=sRGB, fill_type = 'solid')
+
+
+
+
 
 ##            print('---------')
 
 #==================================================================
 #==================================================================
-
-
-    wb.save("image.xlsx")
-
-
+    wb.save(imageXLSX)
 
     pass
 
+#==================================================================
+#==================================================================
 if __name__ == '__main__':
+
+    print('========================================================')
+    print('IMAGE TO XLS')
+    print('========================================================')
 
     x=hex_to_rgb('FF65BA')
     y=rgb_to_hex((255, 255, 195))
 
-    print(x)
-    print(y.upper())
+    print('rgb=',x)
+    print('HEX=',y.upper())
 
     main()
+
+    print('========================================================')
+    print('COMLETED RUN')
+    print('========================================================')

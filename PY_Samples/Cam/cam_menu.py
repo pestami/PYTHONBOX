@@ -17,7 +17,7 @@ import csv
 class cam_menu:
 
     ##  Class variables: This variable is shared between all objects of a class
-    menu=["SOURCE","BL","BR","TR","TL","SAVE PTS","CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"crop","QUIT"]
+    menu=["SOURCE","BL","BR","TR","TL","SAVE PTS","CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"crop","watch","QUIT"]
     ## command history and command latest
     aCMD=["NULL","QUIT1","QUIT2"]
 
