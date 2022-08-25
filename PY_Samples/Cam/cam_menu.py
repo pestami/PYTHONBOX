@@ -17,10 +17,14 @@ import csv
 class cam_menu:
 
     ##  Class variables: This variable is shared between all objects of a class
-    menu=["SOURCE","BL","BR","TR","TL","SAVE PTS","CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"crop","watch","QUIT"]
+    menu=      ["SOURCE","BL" ,"BR" ,"TR" ,"TL" ,"SAVE PTS" ,"CALC","LOAD PTS","LOAD LED","SAVE IMG" ,"crop","watch","QUIT"]
+    menutype=  ["BTN"   ,"BTN","BTN","BTN","BTN","BTN"      ,"BTN" ,"BTN"     ,"BTN"     ,"BTN"      ,"BTN" ,"TGL"  ,"BTN"]
+    menustatus=["BTN"   ,"BTN","BTN","BTN","BTN","BTN"      ,"BTN" ,"BTN"     ,"BTN"     ,"BTN"      ,"BTN" ,"0"    ,"BTN"]
+
+    ## BTN = BUTTON  TGL = TOGGLE
     ## command history and command latest
     aCMD=["NULL","QUIT1","QUIT2"]
-
+    aCMD_TGL=[]
 
     #========================================================
     def __init__(self, oCV2,image):
@@ -32,6 +36,7 @@ class cam_menu:
         self.height_button = int(image.shape[0] / 20)
         self.spacing_button = int(image.shape[1] / (self.menue_items-1))
         self.color = (100, 0, 100) # Blue color in BGR
+        self.color_toggle = (100, 0, 0) # Blue color in BGR
         self.thickness = 2 # Line thickness of 2 px
 ##        print("INITIALIZE: width height sapacing",width_button,height_button,spacing_button ) # test = ok
 
@@ -64,6 +69,15 @@ class cam_menu:
                 TextX = int(1+spacing_button*i +(width_button)/ 80) + 1
                 TextY = int(height_button/2 ) + 1
                 org=(TextX,TextY)
+                if self.menutype[i]=='TGL':
+                    color =self.color_toggle
+                else:
+                    color =self.color
+                if self.menustatus[i]=='1':
+                    image = oCV2.rectangle(image, start_point, end_point, color, 2)
+
+
+
                 image = oCV2.rectangle(image, start_point, end_point, color, thickness)
                 image = oCV2.putText(image, cam_menu.menu[i], org, font, fontScale, color, thickness, oCV2.LINE_AA)
 
@@ -84,6 +98,14 @@ class cam_menu:
             end_point = (1+spacing_button*i+ width_button, height_button)
 
             if (Y< height_button) and (start_point[0] < X < end_point[0]) :
+
+                if self.menutype[i]=='TGL':
+                    if self.menustatus[i]=='1':
+                        new_menustatus='0'
+                    if self.menustatus[i]=='0':
+                        new_menustatus='1'
+                    self.menustatus[i]=new_menustatus
+
                 cmd=cam_menu.menu[i]
 
                 cam_menu.aCMD[2]=cam_menu.aCMD[1]
@@ -97,7 +119,21 @@ class cam_menu:
 
 
         return cam_menu.aCMD
-#----------------------------------------------------------------------------
+#----------------------------------------------------------
+    def getToggleStatus(self,sMenuItem):
+
+        svalue=''
+
+        for i in range(0,self.menue_items-1):
+            if self.menu[i] ==sMenuItem:
+                sValue=self.menustatus[i]
+
+
+        return sValue
+
+
+
+#-----------------------------a-----------------------------------------------
 
 
 if __name__ == '__main__':

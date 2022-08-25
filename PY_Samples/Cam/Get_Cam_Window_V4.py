@@ -22,6 +22,8 @@ import cv2
 import csv
 import sys
 import os
+import datetime
+import schedule
 
 import cam_annotate
 import cam_menu
@@ -124,9 +126,141 @@ def StackImages(img,LED_CAMERA,sPathfile_LED_STACK):
             LED_stack=np.vstack([LED_stack, crop_post_process])
             LED_stack_average=np.vstack([LED_stack_average, Color_img])
 
-     cv2.imwrite(sPathfile_LED_STACK,LED_stack)
+        sPathfile_LED_STACK_raw=sPathfile_LED_STACK.replace('.png','_raw.png')
+        sPathfile_LED_STACK_avg=sPathfile_LED_STACK.replace('.png','_avg.png')
+
+     cv2.imwrite(sPathfile_LED_STACK_raw,LED_stack)
+     cv2.imwrite(sPathfile_LED_STACK_avg,LED_stack_average)
+
      cv2.imshow('LED 1', LED_stack)
      cv2.imshow('LED 2', LED_stack_average)
+
+#==============================================================================
+nDataMeasurement=[[]] ## list of list
+nDataMeasurementQue=[[[]]] ## list of list of list
+nDataQue=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+nSec=5
+
+def job():
+    global nDataQue
+
+    print("=================================================================")
+    print("===Schedule Event=====Seconds:" ,nSec)
+    print("=================================================================")
+    nDataQue = LED_Export(grey_img,LED_TRANS_WORLD,sPathfile_LED_EXPORT,nDataQue)
+    print("=================================================================")
+# run the function job() every 2 seconds
+
+schedule.every(nSec).seconds.do(job)
+
+#===============================================================================
+
+
+
+def LED_Export(img,LED_CAMERA,sPathfile_LED_Export,nDataQueLocal):
+
+    #get current date and time
+    dt = datetime.datetime.now()
+    #convert date and time to string
+    dateTimeStr = str(dt)
+    sDateTime=dt.strftime('%Y_%m_%d_%H_%M_%S')
+    sn_DateTime=dt.strftime('%Y%m%d%H%M%S')
+    sn_YM=dt.strftime('%Y%m')
+    sn_DHMS=dt.strftime('%d%H%M%S')
+    ##-------------------------------------------
+    ## time strings convert to integers
+    nYear=int(sn_YM)
+    nTime=int(sn_DHMS)
+
+    print('LOG FILE: ',sPathfile_LED_EXPORT, '@', sDateTime )
+
+    ##-BEGIN FOR POINTS-----------------------------------------
+    l_LED_CAMERA=[]
+    nCount=0
+    for PTS,i in zip(LED_CAMERA,range(0,len(LED_CAMERA))):  # zip uses shortes of two lists
+
+        LED_X=int(LED_CAMERA[i][1])
+        LED_Y=int(LED_CAMERA[i][2])
+        LED_R=int(LED_CAMERA[i][3])
+
+##        print('LED XY POSITIONS: ',LED_X,LED_Y)
+        nSlice=10
+        cX1=LED_X-nSlice
+        cX2=LED_X+nSlice
+
+        cY1=LED_Y-nSlice
+        cY2=LED_Y+nSlice
+
+        #roi = image[startY:endY, startX:endX]
+        crop = img[cY1:cY2,cX1:cX2 ]
+
+        flag=3  # fails if picture matrix not compatable
+
+        if flag==0 :
+            crop_grey = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            crop_post_process=crop_grey
+        if flag==1 :
+            crop_grey = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            crop_post_process=crop_grey
+        if flag==2 :
+            (thresh, crop_BW) = cv2.threshold(crop_grey, 100, 200, cv2.THRESH_BINARY)
+            crop_post_process=crop_BW
+        if flag==3 :
+            crop_post_process=crop
+
+        crop_avg_color_row=np.average(crop_post_process, axis=0)
+        crop_avg_color = np.average(crop_avg_color_row, axis=0)
+
+        ##-------------------------------------------
+        ## Round colors convert to integers
+        crop_avg_color = np.round_(crop_avg_color)
+        n_crop_avg_color= crop_avg_color.astype(int)
+          ## tag(append) list colors with year month and da hour min sec
+        l_avg_color=n_crop_avg_color.tolist()
+        l_avg_color.insert(0,nTime)
+        l_avg_color.insert(0,nYear)
+        l_avg_color.insert(0,nCount)
+
+        nCount=nCount+1
+
+        ##-------------------------------------------
+        l_LED_CAMERA.append(l_avg_color)
+
+    ##-END FOR POINTS-----------------------------------------
+
+##    nDataQue.insert(0,l_LED_CAMERA)
+##    print('--- nDataQueLocal---')
+##    print(nDataQueLocal)
+    print("---------------------------------------------------")
+    print('---CAMERA MEASUREMENTS: l_LED_CAMERA---')
+    for item in l_LED_CAMERA:
+        print(item)
+    print('--------------------------------------------------')
+    for item in l_LED_CAMERA:
+##        print('Item:',item)
+        nDataQueLocal.insert(0,item)
+        if len(nDataQueLocal)>len(l_LED_CAMERA)*10: # ensure all LED read not cut off
+            nDataQueLocal.pop(-1)  # -1 default
+
+
+    file=open(sPathfile_LED_EXPORT,'w')
+
+    for List_items in nDataQueLocal:
+        sLine=''
+        j=0
+        for integer_items in List_items:
+
+            if j==0:
+                sLine=sDateTime + '\t' + str(integer_items)
+            else:
+                sLine= sLine + '\t' + str(integer_items)
+            j=j+1
+        file.writelines(sLine+'\n')
+    file.close()
+    print("--SAVED TO-------------------------------------------------")
+    print(sPathfile_LED_EXPORT)
+
+    return nDataQueLocal
 
 #==============================================================================
 # Global Points
@@ -193,6 +327,11 @@ def mousePoints(event,x,y,flags,params):
 ##else: sPrefix='workspace_OJS\\'
 
 #------------------------------------------------------------------------------
+
+##for i in range(1,5):
+##    nDataQue.append([0,0,0,0,0,0])
+
+#------------------------------------------------------------------------------
 # Choose WORKSPACE"
 sJOBprefix='job_'
 ##sPrefix='workspace_MPA\\'
@@ -203,7 +342,7 @@ sJOBprefix='job_'
 
 oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2","workspace_1X2_Elastic","workspace_1X2_Perspective"])
 sPrefix = oDialog.Show()
-sPrefix+='\\'
+sPrefix +='\\'
 
 #------------------------------------------------------------------------------
 # select iuser folder
@@ -216,7 +355,9 @@ sPathFileImport=sPrefix + 'MountingFrame_TRANS_WORLD.csv'
 sPathFileExport=sPrefix + 'MountingFrame_CAMERA.csv'
 sPathFileImportLED_WORLD=sPrefix + 'LED_TRANS_WORLD.csv'
 
-sPathfile_LED_STACK=sJOBprefix + 'LED_Stack.png'
+sPathfile_LED_STACK=sPrefix + 'LED_Stack.png'
+sPathfile_LED_EXPORT=sPrefix + 'LED_Stack.log'
+
 #------------------------------------------------------------------------------
 # select image source
 image_source = 1
@@ -413,6 +554,25 @@ while(True):
 ##        print('crop:',cX1,cY1, cX2,cY2)
 
         cam_menu.cam_menu.aCMD[0]="DONE"
+
+    if sCMD=='watch':
+        print('====CROP IMAGE==============================================')
+        print('')
+        print('LED:',LED_TRANS_WORLD[0])
+##        print('crop:',cX1,cY1, cX2,cY2)
+        print('watch Toggle status:', menu.getToggleStatus('watch'))
+
+        cam_menu.cam_menu.aCMD[0]="DONE"
+
+
+
+    if menu.getToggleStatus('watch')=='1':
+##        print('====LOG IMAGE==============================================')
+##        print('')
+        schedule.run_pending()
+##        LED_Export(grey_img,LED_TRANS_WORLD,sPathfile_LED_EXPORT)
+
+
 
 ##=============================================================================
 # TO DO CODE must be replaced:
