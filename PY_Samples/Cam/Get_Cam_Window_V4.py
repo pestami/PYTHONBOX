@@ -11,6 +11,14 @@
 # pip install opencv-python
 # pip install numpy
 #-------------------------------------------------------------------------------
+# TODO (search label)
+# LABEL20220826_00 :  nDimCroshair=10   #LED_TRANS_WORLD[i][3] # size of circles is not scaled
+# LABEL20220826_01 :  Make seperate module for EXPORTING, make test module
+# LABEL20220826_02 :TODO code must be moved to anotiations module
+# LABEL20220826_03 :TODO export to SQLITE
+#
+#-------------------------------------------------------------------------------
+
 def main():
     pass
 
@@ -24,11 +32,14 @@ import sys
 import os
 import datetime
 import schedule
+import subprocess
 
+#--CAX Modules (My modules)
+from selectproject import DialogProjectChoice
 import cam_annotate
 import cam_menu
-import subprocess
-from selectproject import DialogProjectChoice
+import Transformations
+# from module_transformations import transformation # used in Transformations
 ##=============================================================================
 def GetImageDimensions(image):
 
@@ -147,7 +158,8 @@ def job():
     print("=================================================================")
     print("===Schedule Event=====Seconds:" ,nSec)
     print("=================================================================")
-    nDataQue = LED_Export(grey_img,LED_TRANS_WORLD,sPathfile_LED_EXPORT,nDataQue)
+    nDataQue = ExtractPOIs(grey_img,LED_TRANS_WORLD,nDataQue)
+    ExportPOIMeasurements(sPathfile_LED_EXPORT,nDataQue)
     print("=================================================================")
 # run the function job() every 2 seconds
 
@@ -155,9 +167,7 @@ schedule.every(nSec).seconds.do(job)
 
 #===============================================================================
 
-
-
-def LED_Export(img,LED_CAMERA,sPathfile_LED_Export,nDataQueLocal):
+def ExtractPOIs(img,LED_CAMERA,nDataQueLocal):
 
     #get current date and time
     dt = datetime.datetime.now()
@@ -165,8 +175,8 @@ def LED_Export(img,LED_CAMERA,sPathfile_LED_Export,nDataQueLocal):
     dateTimeStr = str(dt)
     sDateTime=dt.strftime('%Y_%m_%d_%H_%M_%S')
     sn_DateTime=dt.strftime('%Y%m%d%H%M%S')
-    sn_YM=dt.strftime('%Y%m')
-    sn_DHMS=dt.strftime('%d%H%M%S')
+    sn_YM=dt.strftime('%Y%m%d')
+    sn_DHMS=dt.strftime('%H%M%S')
     ##-------------------------------------------
     ## time strings convert to integers
     nYear=int(sn_YM)
@@ -242,6 +252,17 @@ def LED_Export(img,LED_CAMERA,sPathfile_LED_Export,nDataQueLocal):
         if len(nDataQueLocal)>len(l_LED_CAMERA)*10: # ensure all LED read not cut off
             nDataQueLocal.pop(-1)  # -1 default
 
+    return nDataQueLocal
+
+# LABEL20220826_01
+def ExportPOIMeasurements(sPathfile_LED_EXPORT,nDataQueLocal):
+    print("===EXPORT==MEASUREMENTS=TO=DELIMITED FILE=====================")
+
+    #get current date and time
+    dt = datetime.datetime.now()
+    #convert date and time to string
+    dateTimeStr = str(dt)
+    sDateTime=dt.strftime('%Y_%m_%d_%H_%M_%S')
 
     file=open(sPathfile_LED_EXPORT,'w')
 
@@ -257,10 +278,9 @@ def LED_Export(img,LED_CAMERA,sPathfile_LED_Export,nDataQueLocal):
             j=j+1
         file.writelines(sLine+'\n')
     file.close()
+
     print("--SAVED TO-------------------------------------------------")
     print(sPathfile_LED_EXPORT)
-
-    return nDataQueLocal
 
 #==============================================================================
 # Global Points
@@ -370,6 +390,8 @@ if image_source==1 :
 if image_source==2 :
     # FILE
     cap = cv2.VideoCapture(sPathfile_VideoSubstituteImage)
+
+
 #------------------------------------------------------------------------------
 # Get Image with  ?filter?
 
@@ -383,6 +405,8 @@ try:
         grey_img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
 except:
         grey_img = cv2.imread(sPathfile_VideoSubstituteImage)
+
+
 
 #------------------------------------------------------------------------------
 # Get Image dimensions
@@ -414,6 +438,7 @@ while(True):
     grey_img_2 = grey_img.copy()
     grey_img=menu.draw(cv2,grey_img)
 ##=============================================================================
+# LABEL20220826_02
 # TODO code must be moved to anotiations module
 #MountingFrame_CAMERA = [['TL', 358, 352], ['BL', 266, 248], ['BR', 446, 155], ['TR', 410, 114]]  #BGR
     for PTS,i in zip(MountingFrame_CAMERA,[0,1,2,3]):  # zip uses shortes of two lists
@@ -437,9 +462,18 @@ while(True):
             cv2.line(img= grey_img_2, pt1=(int(PTS[1]), int(PTS[2])), pt2=(int(PTS_Start[1]), int(PTS_Start[2])), color=(0, 255, 0), thickness=1, lineType=8, shift=0)
 
     for PTS,i in zip(LED_TRANS_WORLD,range(0,len(LED_TRANS_WORLD))):  # zip uses shortes of two lists
-        nDimCroshair=10   #LED_TRANS_WORLD[i][3]
+        nDimCroshair=10   #LED_TRANS_WORLD[i][3]   #LABEL20220826_00
         nCircle=1
-        cv2.circle(grey_img_2,(int(LED_TRANS_WORLD[i][1]),int(LED_TRANS_WORLD[i][2])), nDimCroshair, (0,0,255),nCircle)
+        CircleX=int(LED_TRANS_WORLD[i][1])
+        CircleY=int(LED_TRANS_WORLD[i][2])
+        cv2.circle(grey_img_2,(CircleX,CircleY), nDimCroshair, (0,0,255),nCircle)
+
+        org=(CircleX-nDimCroshair,CircleY+nDimCroshair) # bottom left of circle
+        color = (100, 0, 100) # Blue color in BGR
+        thickness = 1 # Line thickness of 2 px
+        font = cv2.FONT_HERSHEY_SIMPLEX # font
+        fontScale = 0.5 # fontScale
+        cv2.putText(grey_img_2, str(i), org, font, fontScale, color, thickness, cv2.LINE_AA)
 
 ##=============================================================================
 ##    sCMD=menu.command(cv2,grey_img,Xmenu,Ymenu)  # do not draw image in begin
@@ -561,16 +595,13 @@ while(True):
         print('LED:',LED_TRANS_WORLD[0])
 ##        print('crop:',cX1,cY1, cX2,cY2)
         print('watch Toggle status:', menu.getToggleStatus('watch'))
-
         cam_menu.cam_menu.aCMD[0]="DONE"
 
-
-
     if menu.getToggleStatus('watch')=='1':
-##        print('====LOG IMAGE==============================================')
-##        print('')
+#        print('====LOG IMAGE==============================================')
+#        print('')
         schedule.run_pending()
-##        LED_Export(grey_img,LED_TRANS_WORLD,sPathfile_LED_EXPORT)
+#        LED_Export(grey_img,LED_TRANS_WORLD,sPathfile_LED_EXPORT)
 
 
 
@@ -637,6 +668,7 @@ while(True):
 # IMAGE SHOW
     img_3 = np.concatenate((grey_img, grey_img_2), axis=1)
     cv2.imshow('frame',img_3)
+    cv2.setWindowTitle('frame', sPrefix)
     cv2.setMouseCallback('frame', mousePoints)
 
 ##=============================================================================
