@@ -17,6 +17,8 @@ class DialogProjectChoice:
     sProjectList=[]
     sSelection=""
     #------------------------------------------------------------------------
+    # oDialog=DialogProjectChoice(["workspace_1X2","workspace_1X2_ojs","workspace_2x2","workspace_2x2_Elastic","workspace_1X2_Perspective"])
+
     def __init__(self, sProjectList):
 
         self.sProjectList = sProjectList
