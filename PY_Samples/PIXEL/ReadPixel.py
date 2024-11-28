@@ -21,7 +21,7 @@ from PIL import Image
 # creating a image object
 #im = Image.open(r'C:\Users\sesa237770\Documents\Lagrange\PIXEL\invader.jpg')
 
-im = Image.open(r'C:\Users\sesa237770\Pictures\invader.jpg')
+im = Image.open(r'C:\Users\sesa237770\Documents\PYTHONBOX\PY_Samples\PIXEL\invader.jpg')
 
 
 px = im.load()
